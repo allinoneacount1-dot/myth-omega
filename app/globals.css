@@ -3,25 +3,123 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #05070B;
+  --bg-deep: #02030A;
+  --accent-gold: #D8B36A;
+  --accent-ivory: #F7F4EE;
+  --accent-cyan: #3AE9E0;
+  --accent-ember: #A33A4A;
+  --rule: rgba(247, 244, 238, 0.08);
+  --rule-strong: rgba(216, 179, 106, 0.25);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  background: var(--bg);
+  color: var(--accent-ivory);
+}
+
+html, body {
+  overflow-x: hidden;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.65;
+  font-weight: 400;
+  background: var(--bg);
+  color: var(--accent-ivory);
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+/* Lenis smooth scroll */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* Selection */
+::selection {
+  background: rgba(216, 179, 106, 0.35);
+  color: #F7F4EE;
+}
+
+/* Scrollbar — invisible */
+::-webkit-scrollbar {
+  width: 0;
+  background: transparent;
+}
+
+/* Focus ring — global */
+*:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Typography classes */
+.font-display { font-family: var(--font-display), Georgia, serif; }
+.font-body { font-family: var(--font-body), system-ui, sans-serif; }
+.font-mono { font-family: var(--font-mono), monospace; }
+
+.headline-hero {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(56px, 9vw, 144px);
+  line-height: 0.94;
+  letter-spacing: -0.02em;
+}
+.headline-section {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(40px, 6vw, 88px);
+  line-height: 1.02;
+  letter-spacing: -0.015em;
+}
+.headline-editorial {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(28px, 3.5vw, 52px);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+.label {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  line-height: 1.4;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* Hairlines */
+.hairline { border-color: var(--rule); }
+.hairline-gold { border-color: var(--rule-strong); }
+
+/* Section padding tiers */
+.section-sm { padding-top: clamp(72px, 10vh, 120px); padding-bottom: clamp(72px, 10vh, 120px); }
+.section-md { padding-top: clamp(120px, 18vh, 200px); padding-bottom: clamp(120px, 18vh, 200px); }
+.section-lg { padding-top: clamp(160px, 24vh, 280px); padding-bottom: clamp(160px, 24vh, 280px); }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
