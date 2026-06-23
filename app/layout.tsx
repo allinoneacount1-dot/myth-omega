@@ -1,28 +1,6 @@
-import type { Metadata } from 'next';
-import { Inter, Tenor_Sans, JetBrains_Mono } from 'next/font/google';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { SmoothScroll } from '@/components/SmoothScroll';
-
-const display = Tenor_Sans({
-  subsets: ['latin'],
-  weight: ['400'],
-  variable: '--font-display',
-  display: 'swap',
-});
-
-const body = Inter({
-  subsets: ['latin'],
-  weight: ['300', '400', '500'],
-  variable: '--font-body',
-  display: 'swap',
-});
-
-const mono = JetBrains_Mono({
-  subsets: ['latin'],
-  weight: ['400', '500'],
-  variable: '--font-mono',
-  display: 'swap',
-});
 
 export const metadata: Metadata = {
   title: 'MYTH — The Culture Engine',
@@ -33,12 +11,25 @@ export const metadata: Metadata = {
     description: 'Build worlds that outlive you.',
     type: 'website',
   },
+};
+
+export const viewport: Viewport = {
   themeColor: '#05070B',
+  width: 'device-width',
+  initialScale: 1,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable}`}>
+    <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&family=Tenor+Sans&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body className="bg-void text-ivory antialiased">
         <SmoothScroll>{children}</SmoothScroll>
       </body>
