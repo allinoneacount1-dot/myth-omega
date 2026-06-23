@@ -4,6 +4,7 @@ import { SmoothScroll } from '@/components/SmoothScroll';
 import { PageReveal } from '@/components/PageReveal';
 import { ScrollProgress } from '@/components/ScrollProgress';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { ErrorCapture } from '@/components/ErrorCapture';
 
 export const metadata: Metadata = {
   title: 'MYTH — The Culture Engine',
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <SmoothScroll>
               <ScrollProgress />
               {children}
+              <ErrorCapture />
             </SmoothScroll>
           </PageReveal>
         </ErrorBoundary>
