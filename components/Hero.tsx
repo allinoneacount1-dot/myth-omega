@@ -3,8 +3,6 @@
 import { useEffect, useState } from 'react';
 import { HERO } from '@/lib/content';
 import { MythMark } from '@/components/glyphs';
-import { ClientOnly } from '@/components/ClientOnly';
-import { WalletConnectButton } from '@/components/WalletConnectButton';
 
 function HeroParticles() {
   const [mounted, setMounted] = useState(false);
@@ -39,9 +37,14 @@ export function Hero() {
           <div className="h-12 w-px bg-gradient-to-b from-gold to-transparent hero-bounce" />
         </div>
         <div className={`mt-16 ${visible ? 'hero-fade-up hero-delay-6' : 'opacity-0'}`}>
-          <ClientOnly fallback={<button className="label inline-flex items-center gap-3 border border-gold/40 px-10 py-5 text-gold/50">Loading wallet...</button>}>
-            <WalletConnectButton />
-          </ClientOnly>
+          <a href="#enter" className="group relative inline-flex flex-col items-center gap-4">
+            <span className="label text-gold/70 transition-colors duration-500 group-hover:text-gold">Explore Civilization</span>
+            <span className="flex h-10 w-10 items-center justify-center border border-gold/40 rounded-full transition-all duration-700 group-hover:border-gold group-hover:bg-gold/10">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="text-gold hero-bounce">
+                <path d="M8 3v10M4 9l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
+          </a>
         </div>
       </div>
     </section>

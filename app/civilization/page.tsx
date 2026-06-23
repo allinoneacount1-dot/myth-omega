@@ -45,7 +45,7 @@ export default function CivilizationPage() {
         <Reveal>
           <span className="label text-gold">The Living World</span>
           <h1 className="headline-hero mt-6 text-ivory">Civilizations</h1>
-          <p className="mx-auto mt-8 max-w-2xl font-display text-lg italic text-ivory/70 md:text-xl" style={{ fontFamily: 'var(--font-display), serif', lineHeight: '1.5' }}>
+          <p className="mx-auto mt-8 max-w-2xl font-display text-2xl italic text-ivory/70 md:text-3xl" style={{ fontFamily: 'var(--font-display), serif', lineHeight: '1.5' }}>
             Each civilization is a living canon — written by its people, tended by its agents, preserved for the long arc of inheritance.
           </p>
         </Reveal>
@@ -61,7 +61,7 @@ export default function CivilizationPage() {
                 <div className="flex items-start justify-between">
                   <div>
                     <span className="label text-ivory/40">#{String(civ.id).padStart(3, '0')}</span>
-                    <h3 className="mt-3 font-display text-xl text-ivory md:text-2xl" style={{ fontFamily: 'var(--font-display), serif' }}>{civ.name}</h3>
+                    <h3 className="mt-3 font-display text-3xl text-ivory md:text-4xl" style={{ fontFamily: 'var(--font-display), serif' }}>{civ.name}</h3>
                     <p className="mt-1 label text-ivory/50">{civ.genre}</p>
                   </div>
                   <div className="flex h-12 w-12 items-center justify-center border border-rule">
@@ -112,7 +112,7 @@ export default function CivilizationPage() {
                     <Glyph size={32} stroke="currentColor" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-base text-ivory/80" style={{ lineHeight: '1.7' }}>
+                    <p className="text-lg text-ivory/80" style={{ lineHeight: '1.7' }}>
                       <span className="text-gold">{feed.agent}</span>
                       {' '}{feed.action}{' '}
                       <span className="text-ivory">{feed.target}</span>
@@ -144,7 +144,7 @@ export default function CivilizationPage() {
                 <div className="group border border-rule bg-void p-8 transition-all duration-700 hover:border-gold/30 glow-hover">
                   <span className="label text-gold/60">{String(i + 1).padStart(2, '0')}</span>
                   <h4 className="mt-4 font-display text-2xl text-ivory" style={{ fontFamily: 'var(--font-display), serif' }}>{item.name}</h4>
-                  <p className="mt-3 text-sm leading-relaxed text-ivory/65" style={{ lineHeight: '1.7' }}>{item.desc}</p>
+                  <p className="mt-3 text-base leading-relaxed text-ivory/65" style={{ lineHeight: '1.7' }}>{item.desc}</p>
                 </div>
               </Reveal>
             ))}

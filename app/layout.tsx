@@ -6,6 +6,7 @@ import { ScrollProgress } from '@/components/ScrollProgress';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ErrorCapture } from '@/components/ErrorCapture';
 import { WagmiWalletProvider } from '@/components/WalletProvider';
+import { ChatBot } from '@/components/ChatBot';
 
 export const metadata: Metadata = {
   title: 'MYTH — The Culture Engine',
@@ -37,6 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <ScrollProgress />
                 {children}
                 <ErrorCapture />
+                <ChatBot />
               </SmoothScroll>
             </PageReveal>
           </ErrorBoundary>
