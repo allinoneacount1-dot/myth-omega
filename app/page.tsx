@@ -4,6 +4,8 @@ import { AgentGlyph } from '@/components/agent-glyphs';
 import { Reveal } from '@/components/Reveal';
 import { SectionDivider } from '@/components/SectionDivider';
 import { Hero } from '@/components/Hero';
+import { ClientOnly } from '@/components/ClientOnly';
+import { WalletConnectButton } from '@/components/WalletConnectButton';
 import Link from 'next/link';
 
 function SimpleNav() {
@@ -25,9 +27,11 @@ function SimpleNav() {
           <Link href="/civilization" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Worlds</Link>
           <Link href="/governance" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Governance</Link>
         </div>
-        <Link href="#enter" className="label border border-gold/40 px-5 py-2.5 text-gold transition-all duration-500 hover:border-gold hover:bg-gold/10">
-          Enter
-        </Link>
+        <div className="flex items-center gap-4">
+          <ClientOnly fallback={<button className="label border border-gold/40 px-5 py-2.5 text-gold/50">Loading...</button>}>
+            <WalletConnectButton />
+          </ClientOnly>
+        </div>
       </div>
     </nav>
   );
