@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
-function usePrefersReducedMotion() {
+function useSafeReducedMotion() {
   const [reduced, setReduced] = useState(false);
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
     setReduced(mq.matches);
     const handler = (e: MediaQueryListEvent) => setReduced(e.matches);
@@ -17,7 +18,7 @@ function usePrefersReducedMotion() {
 
 export function ScrollProgress() {
   const [progress, setProgress] = useState(0);
-  const reduce = usePrefersReducedMotion();
+  const reduce = useSafeReducedMotion();
 
   useEffect(() => {
     if (reduce) return;

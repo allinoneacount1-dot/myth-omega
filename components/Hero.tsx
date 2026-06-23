@@ -11,9 +11,10 @@ const HeroScene = dynamic(() => import('./HeroScene'), {
   loading: () => <div className="absolute inset-0 bg-void" />,
 });
 
-function usePrefersReducedMotion() {
+function useSafeReducedMotion() {
   const [reduced, setReduced] = useState(false);
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
     setReduced(mq.matches);
     const handler = (e: MediaQueryListEvent) => setReduced(e.matches);
@@ -24,7 +25,7 @@ function usePrefersReducedMotion() {
 }
 
 export function Hero() {
-  const reduce = usePrefersReducedMotion();
+  const reduce = useSafeReducedMotion();
 
   return (
     <section id="top" className="relative flex h-[100vh] min-h-[720px] items-center justify-center overflow-hidden">
