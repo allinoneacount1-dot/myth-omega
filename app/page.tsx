@@ -3,6 +3,7 @@ import { GLYPH_MAP, MythMark } from '@/components/glyphs';
 import { AGENT_GLYPHS } from '@/components/agent-glyphs';
 import { Reveal } from '@/components/Reveal';
 import { StaggerContainer, StaggerItem } from '@/components/Stagger';
+import { Hero } from '@/components/Hero';
 
 export default function Home() {
   return (
@@ -15,7 +16,9 @@ export default function Home() {
             <span className="label text-ivory">MYTH</span>
           </a>
           <div className="hidden items-center gap-10 md:flex">
-            <a href="#chapter-1" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Genesis</a>
+            {CHAPTERS.slice(0, 3).map((c) => (
+              <a key={c.index} href={`#chapter-${c.index}`} className="label text-ivory/55 transition-colors duration-500 hover:text-gold">{c.title}</a>
+            ))}
             <a href="#agents" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Agents</a>
             <a href="#token" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">$MYTH</a>
           </div>
@@ -23,30 +26,7 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* HERO */}
-      <section id="top" className="relative flex h-[100vh] min-h-[720px] items-center justify-center overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(216,179,106,0.08)_0%,transparent_60%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_20%,rgba(58,233,224,0.04)_0%,transparent_50%)]" />
-          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, #D8B36A 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-        </div>
-        <div className="pointer-events-none absolute inset-0" style={{ background: 'radial-gradient(ellipse at center, transparent 40%, rgba(5,7,11,0.8) 100%)' }} />
-        <div className="relative z-10 mx-auto max-w-[1440px] px-6 text-center md:px-10 lg:px-16">
-          <StaggerContainer className="flex flex-col items-center">
-            <StaggerItem><span className="label text-gold">{HERO.eyebrow}</span></StaggerItem>
-            <StaggerItem><h1 className="headline-hero mt-6 text-ivory">{HERO.title}</h1></StaggerItem>
-            <StaggerItem>
-              <p className="mx-auto mt-8 max-w-2xl font-display text-2xl italic text-ivory/85 md:text-3xl" style={{ fontFamily: 'var(--font-display), serif' }}>
-                {HERO.manifesto}
-              </p>
-            </StaggerItem>
-            <StaggerItem><p className="label mt-12 text-ivory/55">{HERO.chapterLine}</p></StaggerItem>
-          </StaggerContainer>
-          <div className="mt-20 flex items-center justify-center">
-            <div className="h-12 w-px animate-pulse bg-gradient-to-b from-gold to-transparent" />
-          </div>
-        </div>
-      </section>
+      <Hero />
 
       {/* CHAPTERS */}
       {CHAPTERS.map((chapter) => {
@@ -63,17 +43,19 @@ export default function Home() {
                 </Reveal>
               </div>
               <div className="md:col-span-9">
-                <h2 className="headline-section text-ivory">{chapter.title}</h2>
-                <p className="mt-6 max-w-2xl font-display text-xl italic text-gold md:text-2xl" style={{ fontFamily: 'var(--font-display), serif' }}>{chapter.sub}</p>
+                <Reveal delay={0.1}><h2 className="headline-section text-ivory">{chapter.title}</h2></Reveal>
+                <Reveal delay={0.2}>
+                  <p className="mt-6 max-w-2xl font-display text-xl italic text-gold md:text-2xl" style={{ fontFamily: 'var(--font-display), serif' }}>{chapter.sub}</p>
+                </Reveal>
                 <div className="mt-16 space-y-8">
                   {chapter.body.map((para, i) => (
-                    <Reveal key={i} delay={0.1 * i}>
+                    <Reveal key={i} delay={0.3 + i * 0.08}>
                       <p className="max-w-2xl text-lg leading-relaxed text-ivory/85 md:text-xl" style={{ lineHeight: '1.75' }}>{para}</p>
                     </Reveal>
                   ))}
                 </div>
                 {chapter.manifest && (
-                  <Reveal delay={0.5}>
+                  <Reveal delay={0.6}>
                     <div className="mt-20 max-w-2xl">
                       <div className="h-px w-16 bg-gold/40" />
                       <p className="mt-8 font-display text-xl italic text-gold md:text-2xl" style={{ fontFamily: 'var(--font-display), serif' }}>{chapter.manifest}</p>
@@ -97,9 +79,11 @@ export default function Home() {
             </div>
           </Reveal>
           <Reveal delay={0.1}><h3 className="headline-section max-w-3xl text-ivory">Seven agents. One canon.</h3></Reveal>
-          <p className="mt-6 max-w-2xl font-display text-xl italic text-gold" style={{ fontFamily: 'var(--font-display), serif' }}>
-            Each civilization is tended by an intelligence with a single sacred duty.
-          </p>
+          <Reveal delay={0.2}>
+            <p className="mt-6 max-w-2xl font-display text-xl italic text-gold" style={{ fontFamily: 'var(--font-display), serif' }}>
+              Each civilization is tended by an intelligence with a single sacred duty.
+            </p>
+          </Reveal>
           <div className="mt-24 grid grid-cols-1 gap-px bg-rule md:grid-cols-2 lg:grid-cols-4">
             {AGENTS.map((agent, i) => {
               const Glyph = AGENT_GLYPHS[agent.name];

@@ -73,7 +73,7 @@ function SceneContent() {
   );
 }
 
-export function HeroScene() {
+function HeroScene() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -100,3 +100,5 @@ export function HeroScene() {
     </R3FErrorBoundary>
   );
 }
+
+export default HeroScene;
