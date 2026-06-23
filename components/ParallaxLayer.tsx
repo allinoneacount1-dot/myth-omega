@@ -4,12 +4,12 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import * as THREE from 'three';
 
 interface ParallaxLayerProps {
-  scrollOffset: number;
+  scrollOffset?: number;
   variant?: 'rings' | 'pyramid' | 'helix';
   color?: string;
 }
 
-function ParallaxLayer({ scrollOffset, variant = 'rings', color = '#D8B36A' }: ParallaxLayerProps) {
+function ParallaxLayer({ scrollOffset = 0, variant = 'rings', color = '#D8B36A' }: ParallaxLayerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const init = useCallback(() => {
@@ -106,4 +106,5 @@ function ParallaxLayer({ scrollOffset, variant = 'rings', color = '#D8B36A' }: P
   );
 }
 
+export { ParallaxLayer };
 export default ParallaxLayer;

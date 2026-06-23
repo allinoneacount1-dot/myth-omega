@@ -27,6 +27,16 @@ const AGENT_FEED = [
   { agent: 'Archivist', action: 'indexed artifact:', target: 'The Obsidian Codex', time: '31m ago', icon: 'Archivist' },
 ];
 
+const AGENT_CARDS = [
+  { name: 'Historian', color: '#D8B36A', role: 'Continuity Keeper' },
+  { name: 'Archivist', color: '#3AE9E0', role: 'Living Memory' },
+  { name: 'Lorekeeper', color: '#9B4DFF', role: 'Canon Guardian' },
+  { name: 'Oracle', color: '#FFD700', role: 'Narrative Evolution' },
+  { name: 'Diplomat', color: '#00B4A8', role: 'Civilization Interaction' },
+  { name: 'Worldbuilder', color: '#FF4D00', role: 'Universe Expansion' },
+  { name: 'Narrator', color: '#A33A4A', role: 'Living Events' },
+];
+
 export default function CivilizationPage() {
   return (
     <main className="bg-void text-ivory">
@@ -88,37 +98,27 @@ export default function CivilizationPage() {
         </div>
       </section>
 
-      <SectionDivider variant="glyph" />
+      <ParallaxLayer variant="rings" />
 
-      {/* Agent Activity Feed */}
+      {/* Agent Cards Grid */}
       <section className="section-md mx-auto max-w-[1440px] px-6 md:px-10 lg:px-16">
         <Reveal>
           <div className="mb-20 flex items-baseline gap-6">
-            <span className="label text-gold">Live Feed</span>
+            <span className="label text-gold">The Agents</span>
             <span className="h-px flex-1 bg-rule" />
             <span className="label text-ivory/40">Seven agents at work</span>
           </div>
         </Reveal>
-        <div className="grid grid-cols-1 gap-px bg-rule md:grid-cols-2">
-          {AGENT_FEED.map((feed, i) => (
-            <Reveal key={i} delay={i * 0.06}>
-              <div className="flex items-start gap-4 bg-void-deep p-6 transition-colors duration-500 hover:bg-sapphire/20">
-                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center border border-rule text-gold/70">
-                  <AgentGlyph name={feed.icon} size={32} stroke="currentColor" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm text-ivory/80">
-                    <span className="text-gold">{feed.agent}</span>
-                    {' '}{feed.action}{' '}
-                    <span className="text-ivory">{feed.target}</span>
-                  </p>
-                  <p className="mt-1 label text-ivory/30">{feed.time}</p>
-                </div>
-              </div>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {AGENT_CARDS.map((agent, i) => (
+            <Reveal key={agent.name} delay={i * 0.08}>
+              <Agent3DCard name={agent.name} color={agent.color} role={agent.role} />
             </Reveal>
           ))}
         </div>
       </section>
+
+      <ParallaxLayer variant="pyramid" />
 
       <SectionDivider variant="wave" />
 
@@ -145,6 +145,8 @@ export default function CivilizationPage() {
           </div>
         </div>
       </section>
+
+      <ParallaxLayer variant="helix" />
 
       {/* CTA */}
       <section className="section-lg text-center">

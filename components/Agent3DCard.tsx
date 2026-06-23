@@ -174,4 +174,5 @@ function Agent3DCard({ name, color, role }: Agent3DCardProps) {
   );
 }
 
+export { Agent3DCard };
 export default Agent3DCard;
