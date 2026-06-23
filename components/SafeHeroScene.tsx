@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 
-const HeroScene = dynamic(() => import('./HeroScene'), {
+const HeroScene = dynamic(async () => (await import('./HeroScene')).HeroScene, {
   ssr: false,
   loading: () => null,
 });

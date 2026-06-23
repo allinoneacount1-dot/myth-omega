@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { HERO } from '@/lib/content';
 import { MythMark } from '@/components/glyphs';
 
-const HeroScene = dynamic(() => import('./HeroScene'), {
+const HeroScene = dynamic(async () => (await import('./HeroScene')).HeroScene, {
   ssr: false,
   loading: () => <div className="absolute inset-0 bg-void" />,
 });
