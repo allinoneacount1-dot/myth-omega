@@ -6,11 +6,20 @@ export function ErrorCapture() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const sendError = (message: string) => {
+      setError(message);
+      fetch('/api/errors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message }),
+      }).catch(() => {});
+    };
+
     const handler = (e: ErrorEvent) => {
-      setError(e.message + ' at ' + e.filename + ':' + e.lineno);
+      sendError(e.message + ' at ' + e.filename + ':' + e.lineno);
     };
     const handler2 = (e: PromiseRejectionEvent) => {
-      setError('Promise: ' + String(e.reason));
+      sendError('Promise: ' + String(e.reason));
     };
     window.addEventListener('error', handler);
     window.addEventListener('unhandledrejection', handler2);
