@@ -59,9 +59,9 @@ export async function POST(req: NextRequest) {
       ? 'https://openrouter.ai/api/v1/chat/completions'
       : 'https://api.openai.com/v1/chat/completions';
 
-    const model = process.env.OPENROUTER_API_KEY
-      ? (process.env.ORACLE_MODEL || 'openrouter/auto')
-      : (process.env.OPENAI_MODEL || 'gpt-4o-mini');
+    // OpenRouter model: use as-is (e.g. "openrouter/auto", "google/gemini-2.0-flash")
+    // If ORACLE_MODEL not set, default to openrouter/auto
+    const model = process.env.ORACLE_MODEL || 'openrouter/auto';
 
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -91,6 +91,12 @@ export async function POST(req: NextRequest) {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Oracle API error:', response.status, errorText);
+      if (response.status === 429) {
+        return NextResponse.json(
+          { error: 'The Oracle is experiencing high traffic. Please wait a moment and try again.' },
+          { status: 429 }
+        );
+      }
       return NextResponse.json({ error: 'The Oracle encountered a disturbance.' }, { status: 500 });
     }
 
