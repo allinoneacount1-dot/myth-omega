@@ -15,6 +15,7 @@ const config: Config = {
         sapphire: '#10213A',
         cyan: { DEFAULT: '#3AE9E0' },
         ember: { DEFAULT: '#A33A4A' },
+        teal: { DEFAULT: '#00B4A8' },
       },
       fontFamily: {
         display: ['var(--font-display)', 'Georgia', 'serif'],

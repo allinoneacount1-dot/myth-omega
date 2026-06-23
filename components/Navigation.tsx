@@ -28,6 +28,8 @@ export function Navigation() {
             <Link href="/agents" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Agents</Link>
             <Link href="/civilization" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Worlds</Link>
             <Link href="/governance" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Governance</Link>
+            <Link href="/oracle" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Oracle</Link>
+            <Link href="/atlas" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Atlas</Link>
           </div>
           <div className="flex items-center gap-4">
             <ClientOnly fallback={<button className="label border border-gold/40 px-5 py-2.5 text-gold/50">Loading...</button>}>
@@ -81,6 +83,13 @@ export function Navigation() {
             ))}
             {[
               { href: '/agents', label: 'The Seven Agents' },
+              { href: '/oracle', label: 'Oracle Engine' },
+              { href: '/archive', label: 'Archive' },
+              { href: '/diplomacy', label: 'Diplomacy' },
+              { href: '/rituals', label: 'Rituals' },
+              { href: '/atlas', label: 'Atlas' },
+              { href: '/score', label: 'Culture Score' },
+              { href: '/inheritance', label: 'Inheritance' },
               { href: '/token', label: '$MYTH Token' },
               { href: '/civilization', label: 'Civilizations' },
               { href: '/forge', label: 'Canon Builder' },

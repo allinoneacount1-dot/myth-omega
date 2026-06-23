@@ -236,3 +236,67 @@ html.lenis body {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-6px); }
 }
+
+/* Particle float for archive hero */
+@keyframes particleFloat {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
+    opacity: 0.15;
+  }
+  25% {
+    transform: translateY(-18px) translateX(4px);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateY(-8px) translateX(-3px);
+    opacity: 0.25;
+  }
+  75% {
+    transform: translateY(-22px) translateX(6px);
+    opacity: 0.5;
+  }
+}
+
+/* Archive glow hover */
+@keyframes archiveGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(216, 179, 106, 0);
+  }
+  50% {
+    box-shadow: 0 0 24px rgba(216, 179, 106, 0.12);
+  }
+}
+
+/* Network node pulse */
+@keyframes nodePulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(216, 179, 106, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(216, 179, 106, 0);
+  }
+}
+
+/* Timeline entry entrance */
+@keyframes timelineSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Grid card entrance */
+@keyframes gridCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
