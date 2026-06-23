@@ -45,16 +45,18 @@ export default function AgentsPage() {
             const Glyph = AgentGlyph;
             return (
               <Reveal key={agent.name} delay={0.05 * i}>
-                <article className="group flex h-full flex-col bg-void-deep p-8 transition-colors duration-700 hover:bg-sapphire/40">
-                  <div className="mb-8 flex items-baseline justify-between">
-                    <span className="label text-gold/60">{String(i + 1).padStart(2, '0')}</span>
-                    <span className="label text-ivory/30">{agent.role}</span>
-                  </div>
-                  <div className="mb-10 text-gold transition-transform duration-700 group-hover:scale-110"><Glyph name={agent.name} size={72} stroke="currentColor" /></div>
-                  <h4 className="font-display text-3xl text-ivory" style={{ fontFamily: 'var(--font-display), serif' }}>{agent.name}</h4>
-                  <p className="mt-4 flex-1 text-sm leading-relaxed text-ivory/70" style={{ lineHeight: '1.65' }}>{agent.desc}</p>
-                  <div className="mt-8 h-px w-12 bg-gold/30 transition-all duration-700 group-hover:w-full" />
-                </article>
+                <Link href={`/agents/${agent.name.toLowerCase()}`}>
+                  <article className="group flex h-full flex-col bg-void-deep p-8 transition-colors duration-700 hover:bg-sapphire/40 cursor-pointer">
+                    <div className="mb-8 flex items-baseline justify-between">
+                      <span className="label text-gold/60">{String(i + 1).padStart(2, '0')}</span>
+                      <span className="label text-ivory/30">{agent.role}</span>
+                    </div>
+                    <div className="mb-10 text-gold transition-transform duration-700 group-hover:scale-110"><Glyph name={agent.name} size={72} stroke="currentColor" /></div>
+                    <h4 className="font-display text-3xl text-ivory" style={{ fontFamily: 'var(--font-display), serif' }}>{agent.name}</h4>
+                    <p className="mt-4 flex-1 text-sm leading-relaxed text-ivory/70" style={{ lineHeight: '1.65' }}>{agent.desc}</p>
+                    <div className="mt-8 h-px w-12 bg-gold/30 transition-all duration-700 group-hover:w-full" />
+                  </article>
+                </Link>
               </Reveal>
             );
           })}
