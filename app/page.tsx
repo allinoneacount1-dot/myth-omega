@@ -1,10 +1,16 @@
 'use client';
 
-import { useState, useEffect, type ReactNode } from 'react';
+import { useState, useEffect, type ReactNode, Suspense } from 'react';
 import { motion } from 'framer-motion';
+import dynamic from 'next/dynamic';
 import { CHAPTERS, AGENTS, TOKEN, ECOSYSTEM, FINAL, HERO } from '@/lib/content';
 import { GLYPH_MAP, MythMark } from '@/components/glyphs';
 import { AGENT_GLYPHS } from '@/components/agent-glyphs';
+
+const HeroScene = dynamic(() => import('@/components/HeroScene').then(m => m.HeroScene), {
+  ssr: false,
+  loading: () => <div className="absolute inset-0 bg-void" />,
+});
 
 /* ── Safe reduced-motion hook (no window access during SSR) ── */
 function usePrefersReducedMotion() {
@@ -90,16 +96,16 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* ── HERO (no R3F yet — CSS gradient) ── */}
+      {/* ── HERO ── */}
       <section id="top" className="relative flex h-[100vh] min-h-[720px] items-center justify-center overflow-hidden">
-        {/* CSS ambient background — replaces R3F for now */}
+        {/* R3F constellation background */}
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(216,179,106,0.08)_0%,transparent_60%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_20%,rgba(58,233,224,0.04)_0%,transparent_50%)]" />
-          {/* Subtle dot grid */}
-          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, #D8B36A 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+          <Suspense fallback={<div className="absolute inset-0 bg-void" />}>
+            <HeroScene />
+          </Suspense>
         </div>
-        {/* Vignette */}
+        {/* Ambient CSS fallback + vignette */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(216,179,106,0.06)_0%,transparent_60%)]" />
         <div className="pointer-events-none absolute inset-0" style={{ background: 'radial-gradient(ellipse at center, transparent 40%, rgba(5,7,11,0.8) 100%)' }} />
 
         <div className="relative z-10 mx-auto max-w-[1440px] px-6 text-center md:px-10 lg:px-16">
