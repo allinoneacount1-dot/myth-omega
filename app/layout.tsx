@@ -3,7 +3,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'MYTH — The Culture Engine',
-  description: 'Build worlds that outlive you. The first Culture Engine for persistent digital civilizations.',
+  description: 'Build worlds that outlive you.',
 };
 
 export const viewport: Viewport = {
