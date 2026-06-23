@@ -56,7 +56,8 @@ export default function CivilizationPage() {
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {CIVILIZATIONS.map((civ) => (
             <Reveal key={civ.id}>
-              <article className="group relative border border-rule bg-void-deep p-8 glow-hover transition-all duration-700">
+              <Link href={`/civilization/${civ.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>
+                <article className="group relative border border-rule bg-void-deep p-8 glow-hover transition-all duration-700 cursor-pointer">
                 <div className="absolute left-0 top-0 h-1 w-full origin-left scale-x-0 bg-gradient-to-r from-gold/60 to-transparent transition-transform duration-700 group-hover:scale-x-100" />
                 <div className="flex items-start justify-between">
                   <div>
@@ -86,6 +87,7 @@ export default function CivilizationPage() {
                   <div className="h-full bg-gradient-to-r from-gold/80 to-gold/30 transition-all duration-1000" style={{ width: `${civ.health}%` }} />
                 </div>
               </article>
+              </Link>
             </Reveal>
           ))}
         </div>

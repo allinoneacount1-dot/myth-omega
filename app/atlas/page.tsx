@@ -3,6 +3,7 @@ import { Navigation } from '@/components/Navigation';
 import { MythMark } from '@/components/glyphs';
 import { SectionDivider } from '@/components/SectionDivider';
 import { Reveal } from '@/components/Reveal';
+import Link from 'next/link';
 
 
 interface Civilization {
@@ -309,7 +310,8 @@ export default function AtlasPage() {
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {CIVILIZATIONS.map((civ) => (
             <Reveal key={civ.id}>
-              <article className="group relative border border-rule bg-void-deep p-8 glow-hover transition-all duration-700">
+              <Link href={`/civilization/${civ.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>
+                <article className="group relative border border-rule bg-void-deep p-8 glow-hover transition-all duration-700 cursor-pointer">
                 {/* Top accent line */}
                 <div className="absolute left-0 top-0 h-1 w-full origin-left scale-x-0 transition-transform duration-700 group-hover:scale-x-100" style={{ background: `linear-gradient(90deg, ${civ.color}, transparent)` }} />
 
@@ -383,11 +385,12 @@ export default function AtlasPage() {
 
                 {/* Explore Button */}
                 <div className="mt-8">
-                  <button className="label w-full border border-rule py-4 text-ivory/60 transition-all duration-500 hover:border-gold/40 hover:text-gold" style={{ fontSize: '10px' }}>
+                  <span className="label inline-flex w-full items-center justify-center border border-rule py-4 text-ivory/60 transition-all duration-500 hover:border-gold/40 hover:text-gold" style={{ fontSize: '10px' }}>
                     Explore {civ.name} <span aria-hidden="true" className="ml-2">→</span>
-                  </button>
+                  </span>
                 </div>
               </article>
+              </Link>
             </Reveal>
           ))}
         </div>
