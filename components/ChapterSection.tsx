@@ -1,6 +1,6 @@
 'use client';
 
-import { Reveal } from './Reveal';
+import { Reveal } from '@/components/Reveal';
 import { CHAPTERS } from '@/lib/content';
 import { GLYPH_MAP } from '@/components/glyphs';
 
@@ -16,7 +16,6 @@ export function ChapterSection({ chapter }: ChapterSectionProps) {
       id={`chapter-${chapter.index}`}
       className="relative section-md mx-auto max-w-[1440px] px-6 md:px-10 lg:px-16"
     >
-      {/* Chapter marker — left side */}
       <div className="grid grid-cols-1 gap-12 md:grid-cols-12">
         <div className="md:col-span-3">
           <Reveal>
@@ -31,7 +30,6 @@ export function ChapterSection({ chapter }: ChapterSectionProps) {
           </Reveal>
         </div>
 
-        {/* Main content */}
         <div className="md:col-span-9">
           <Reveal delay={0.1}>
             <h2 className="headline-section text-ivory">
@@ -57,7 +55,6 @@ export function ChapterSection({ chapter }: ChapterSectionProps) {
             ))}
           </div>
 
-          {/* Manifest line — editorial italic, gold rule above */}
           {chapter.manifest && (
             <Reveal delay={0.7}>
               <div className="mt-20 max-w-2xl">
