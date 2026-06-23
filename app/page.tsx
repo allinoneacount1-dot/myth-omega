@@ -1,21 +1,42 @@
-'use client';
-
 import { CHAPTERS, AGENTS, TOKEN, ECOSYSTEM, FINAL, HERO } from '@/lib/content';
 import { MythMark } from '@/components/glyphs';
 import { AgentGlyph } from '@/components/agent-glyphs';
 import { Reveal } from '@/components/Reveal';
 import { SectionDivider } from '@/components/SectionDivider';
 import { Hero } from '@/components/Hero';
-import { Navigation } from '@/components/Navigation';
-import { ClientOnly } from '@/components/ClientOnly';
-import { WalletConnectButton } from '@/components/WalletConnectButton';
-import { motion } from 'framer-motion';
 import Link from 'next/link';
 
-function HomeContent() {
+function SimpleNav() {
+  return (
+    <nav className="fixed left-0 right-0 top-0 z-50 border-b border-transparent bg-void/70 backdrop-blur-md">
+      <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-5 md:px-10 lg:px-16">
+        <Link href="/" className="flex items-center gap-3">
+          <MythMark size={32} stroke="#F7F4EE" />
+          <span className="label text-ivory">MYTH</span>
+        </Link>
+        <div className="hidden items-center gap-8 md:flex lg:gap-10">
+          <a href="#chapter-1" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Genesis</a>
+          <span className="text-ivory/20">/</span>
+          <a href="#chapter-2" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Birth</a>
+          <span className="text-ivory/20">/</span>
+          <a href="#chapter-3" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Rise</a>
+          <span className="text-ivory/20">·</span>
+          <Link href="/agents" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Agents</Link>
+          <Link href="/civilization" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Worlds</Link>
+          <Link href="/governance" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Governance</Link>
+        </div>
+        <Link href="#enter" className="label border border-gold/40 px-5 py-2.5 text-gold transition-all duration-500 hover:border-gold hover:bg-gold/10">
+          Enter
+        </Link>
+      </div>
+    </nav>
+  );
+}
+
+export default function HomePage() {
   return (
     <main className="bg-void text-ivory">
-      <Navigation />
+      <SimpleNav />
       <Hero />
       <SectionDivider variant="particles" />
 
@@ -198,9 +219,11 @@ function HomeContent() {
             </p>
           </Reveal>
           <Reveal delay={0.5}>
-            <ClientOnly fallback={<a href="#" className="label mt-16 inline-flex items-center gap-3 border border-gold px-10 py-5 text-gold transition-all duration-700 hover:bg-gold hover:text-void">{FINAL.cta}<span aria-hidden="true">→</span></a>}>
-              <WalletConnectButton onClick={() => {}} />
-            </ClientOnly>
+            <div className="mt-16">
+              <a href="#chapter-1" className="label inline-flex items-center gap-3 border border-gold px-10 py-5 text-gold transition-all duration-700 hover:bg-gold hover:text-void">
+                Explore MYTH<span aria-hidden="true">→</span>
+              </a>
+            </div>
           </Reveal>
         </div>
       </section>
@@ -255,13 +278,5 @@ function HomeContent() {
         </div>
       </footer>
     </main>
-  );
-}
-
-export default function HomePage() {
-  return (
-    <ClientOnly>
-      <HomeContent />
-    </ClientOnly>
   );
 }

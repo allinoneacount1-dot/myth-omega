@@ -1,110 +1,104 @@
 'use client';
 
-import { useRef, useEffect, useState, useCallback } from 'react';
-import * as THREE from 'three';
-
 interface ParallaxLayerProps {
-  scrollOffset?: number;
   variant?: 'rings' | 'pyramid' | 'helix';
   color?: string;
 }
 
-function ParallaxLayer({ scrollOffset = 0, variant = 'rings', color = '#D8B36A' }: ParallaxLayerProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
+export function ParallaxLayer({ variant = 'rings', color = '#D8B36A' }: ParallaxLayerProps) {
+  if (variant === 'pyramid') {
+    return (
+      <div className="pointer-events-none overflow-hidden py-16 opacity-30">
+        <svg viewBox="0 0 200 120" className="mx-auto w-48" style={{ display: 'block' }}>
+          <defs>
+            <linearGradient id="pyramidGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+              <stop offset="0%" stopColor={color} stopOpacity="0.6" />
+              <stop offset="100%" stopColor={color} stopOpacity="0.05" />
+            </linearGradient>
+          </defs>
+          <polygon points="100,10 180,110 20,110" fill="url(#pyramidGrad)" stroke={color} strokeWidth="0.5" opacity="0.5">
+            <animate attributeName="opacity" dur="6s" repeatCount="indefinite" values="0.3;0.6;0.3" />
+          </polygon>
+          <line x1="100" y1="10" x2="100" y2="110" stroke={color} strokeWidth="0.3" opacity="0.3" />
+          <line x1="20" y1="110" x2="100" y2="60" stroke={color} strokeWidth="0.3" opacity="0.2" />
+          <line x1="180" y1="110" x2="100" y2="60" stroke={color} strokeWidth="0.3" opacity="0.2" />
+        </svg>
+      </div>
+    );
+  }
 
-  const init = useCallback(() => {
-    if (!containerRef.current) return;
-    const container = containerRef.current;
-    const width = container.clientWidth;
-    const height = container.clientHeight;
+  if (variant === 'helix') {
+    return (
+      <div className="pointer-events-none overflow-hidden py-16 opacity-30">
+        <svg viewBox="0 0 200 120" className="mx-auto w-48" style={{ display: 'block' }}>
+          <defs>
+            <linearGradient id="helixGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor={color} stopOpacity="0.1" />
+              <stop offset="50%" stopColor={color} stopOpacity="0.5" />
+              <stop offset="100%" stopColor={color} stopOpacity="0.1" />
+            </linearGradient>
+          </defs>
+          <path d="M60,10 Q100,30 140,10 Q100,50 60,70 Q100,90 140,70 Q100,110 60,110" fill="none" stroke={color} strokeWidth="1" opacity="0.5">
+            <animate attributeName="stroke-dashoffset" dur="8s" repeatCount="indefinite" values="0;200" />
+            <animate attributeName="opacity" dur="4s" repeatCount="indefinite" values="0.2;0.5;0.2" />
+          </path>
+          <path d="M140,10 Q100,30 60,10 Q100,50 140,70 Q100,90 60,70 Q100,110 140,110" fill="none" stroke={color} strokeWidth="1" opacity="0.3">
+            <animate attributeName="stroke-dashoffset" dur="8s" repeatCount="indefinite" values="200;0" />
+            <animate attributeName="opacity" dur="4s" repeatCount="indefinite" values="0.1;0.3;0.1" />
+          </path>
+          {[10, 40, 70, 100].map((y, i) => (
+            <circle key={i} cx="100" cy={y} r="2" fill={color} opacity="0.4">
+              <animate attributeName="r" dur={`${3 + i * 0.5}s`} repeatCount="indefinite" values={`${1 + i * 0.3};${3 + i * 0.5};${1 + i * 0.3}`} />
+              <animate attributeName="opacity" dur={`${3 + i * 0.5}s`} repeatCount="indefinite" values="0.2;0.7;0.2" />
+            </circle>
+          ))}
+        </svg>
+      </div>
+    );
+  }
 
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 100);
-    camera.position.z = 8;
-
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setClearColor(0x000000, 0);
-    container.appendChild(renderer.domElement);
-
-    const col = new THREE.Color(color);
-    let mesh: THREE.Mesh | THREE.LineSegments;
-
-    switch (variant) {
-      case 'pyramid': {
-        const geo = new THREE.ConeGeometry(2, 4, 4);
-        const mat = new THREE.MeshStandardMaterial({
-          color: col, emissive: col, emissiveIntensity: 0.2, metalness: 0.9, roughness: 0.1, transparent: true, opacity: 0.4,
-        });
-        mesh = new THREE.Mesh(geo, mat);
-        break;
-      }
-      case 'helix': {
-        const curve = new THREE.CatmullRomCurve3([
-          new THREE.Vector3(-2, -3, 0), new THREE.Vector3(2, -1, 1), new THREE.Vector3(-1, 1, -1),
-          new THREE.Vector3(2, 3, 0), new THREE.Vector3(-1, 4, 1),
-        ]);
-        const geo = new THREE.TubeGeometry(curve, 50, 0.15, 8, false);
-        const mat = new THREE.MeshStandardMaterial({
-          color: col, emissive: col, emissiveIntensity: 0.3, metalness: 0.7, roughness: 0.2, transparent: true, opacity: 0.5,
-        });
-        mesh = new THREE.Mesh(geo, mat);
-        break;
-      }
-      default: { // rings
-        const geo = new THREE.TorusGeometry(2.5, 0.05, 16, 100);
-        const mat = new THREE.MeshStandardMaterial({
-          color: col, emissive: col, emissiveIntensity: 0.2, metalness: 0.8, roughness: 0.2, transparent: true, opacity: 0.4,
-        });
-        mesh = new THREE.Mesh(geo, mat);
-        break;
-      }
-    }
-
-    scene.add(mesh);
-
-    // Ambient + point light
-    scene.add(new THREE.AmbientLight(0xffffff, 0.2));
-    const light = new THREE.PointLight(col, 1, 20);
-    light.position.set(5, 5, 5);
-    scene.add(light);
-
-    let animId: number;
-    const animate = () => {
-      animId = requestAnimationFrame(animate);
-      mesh.rotation.x += 0.003;
-      mesh.rotation.y += 0.005;
-      renderer.render(scene, camera);
-    };
-    animate();
-
-    return () => {
-      cancelAnimationFrame(animId);
-      if (container.contains(renderer.domElement)) container.removeChild(renderer.domElement);
-      renderer.dispose();
-    };
-  }, [variant, color]);
-
-  useEffect(() => {
-    const cleanup = init();
-    return cleanup;
-  }, [init]);
-
-  const parallaxY = scrollOffset * 0.3;
-  const parallaxX = Math.sin(scrollOffset * 0.001) * 2;
-
+  // rings (default)
   return (
-    <div
-      ref={containerRef}
-      className="pointer-events-none absolute inset-0 overflow-hidden"
-      style={{
-        transform: `translate(${parallaxX}px, ${parallaxY}px)`,
-        opacity: 0.6,
-      }}
-    />
+    <div className="pointer-events-none overflow-hidden py-16 opacity-30">
+      <svg viewBox="0 0 200 120" className="mx-auto w-48" style={{ display: 'block' }}>
+        <defs>
+          <radialGradient id="ringGrad">
+            <stop offset="0%" stopColor={color} stopOpacity="0" />
+            <stop offset="70%" stopColor={color} stopOpacity="0.3" />
+            <stop offset="100%" stopColor={color} stopOpacity="0" />
+          </radialGradient>
+        </defs>
+        {[30, 45, 60].map((r, i) => (
+          <ellipse
+            key={i}
+            cx="100"
+            cy="60"
+            rx={r}
+            ry={r * 0.35}
+            fill="none"
+            stroke={color}
+            strokeWidth="0.8"
+            opacity={0.3 + i * 0.1}
+            strokeDasharray={`${4 + i * 2} ${4 + i}`}
+          >
+            <animateTransform
+              attributeName="transform"
+              type="rotate"
+              from={`0 100 60`}
+              to={`${i % 2 === 0 ? 360 : -360} 100 60`}
+              dur={`${12 + i * 4}s`}
+              repeatCount="indefinite"
+            />
+            <animate attributeName="opacity" dur={`${4 + i}s`} repeatCount="indefinite" values={`${0.15 + i * 0.1};${0.4 + i * 0.1};${0.15 + i * 0.1}`} />
+          </ellipse>
+        ))}
+        <circle cx="100" cy="60" r="3" fill={color} opacity="0.5">
+          <animate attributeName="r" dur="3s" repeatCount="indefinite" values="2;4;2" />
+          <animate attributeName="opacity" dur="3s" repeatCount="indefinite" values="0.3;0.7;0.3" />
+        </circle>
+      </svg>
+    </div>
   );
 }
 
-export { ParallaxLayer };
 export default ParallaxLayer;

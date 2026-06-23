@@ -1,12 +1,9 @@
-'use client';
 import { Navigation } from '@/components/Navigation';
 import { Reveal } from '@/components/Reveal';
 import { SectionDivider } from '@/components/SectionDivider';
 import { AGENTS, ECOSYSTEM } from '@/lib/content';
-import { Agent3DCard } from '@/components/Agent3DCard';
-import { ParallaxLayer } from '@/components/ParallaxLayer';
+import { HistorianGlyph, ArchivistGlyph, LorekeeperGlyph, OracleGlyph, DiplomatGlyph, WorldbuilderGlyph, NarratorGlyph } from '@/components/agent-glyphs';
 import { MythMark } from '@/components/glyphs';
-import { motion } from 'framer-motion';
 import Link from 'next/link';
 
 const CIVILIZATIONS = [
@@ -18,6 +15,16 @@ const CIVILIZATIONS = [
   { id: 6, name: 'Silent Bloom', canon: 78, members: 1567, health: 71, color: '#00B4A8', genre: 'Pastoral Mystery' },
 ];
 
+const AGENT_GLYPHS: Record<string, React.FC<{ size?: number; stroke?: string }>> = {
+  Historian: HistorianGlyph,
+  Archivist: ArchivistGlyph,
+  Lorekeeper: LorekeeperGlyph,
+  Oracle: OracleGlyph,
+  Diplomat: DiplomatGlyph,
+  Worldbuilder: WorldbuilderGlyph,
+  Narrator: NarratorGlyph,
+};
+
 const AGENT_FEED = [
   { agent: 'Oracle', action: 'predicted next chapter for', target: 'Aetheria', time: '2m ago', icon: 'Oracle' },
   { agent: 'Worldbuilder', action: 'generated geography:', target: 'The Crystalline Depths', time: '5m ago', icon: 'Worldbuilder' },
@@ -25,16 +32,6 @@ const AGENT_FEED = [
   { agent: 'Narrator', action: 'composed event:', target: 'The Festival of Echoes', time: '18m ago', icon: 'Narrator' },
   { agent: 'Diplomat', action: 'negotiated treaty between', target: 'Aetheria & Ember Accord', time: '25m ago', icon: 'Diplomat' },
   { agent: 'Archivist', action: 'indexed artifact:', target: 'The Obsidian Codex', time: '31m ago', icon: 'Archivist' },
-];
-
-const AGENT_CARDS = [
-  { name: 'Historian', color: '#D8B36A', role: 'Continuity Keeper' },
-  { name: 'Archivist', color: '#3AE9E0', role: 'Living Memory' },
-  { name: 'Lorekeeper', color: '#9B4DFF', role: 'Canon Guardian' },
-  { name: 'Oracle', color: '#FFD700', role: 'Narrative Evolution' },
-  { name: 'Diplomat', color: '#00B4A8', role: 'Civilization Interaction' },
-  { name: 'Worldbuilder', color: '#FF4D00', role: 'Universe Expansion' },
-  { name: 'Narrator', color: '#A33A4A', role: 'Living Events' },
 ];
 
 export default function CivilizationPage() {
@@ -57,13 +54,9 @@ export default function CivilizationPage() {
       {/* Civilization Grid */}
       <section className="section-md mx-auto max-w-[1440px] px-6 md:px-10 lg:px-16">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {CIVILIZATIONS.map((civ, i) => (
-            <Reveal key={civ.id} delay={i * 0.08}>
-              <motion.article
-                className="group relative border border-rule bg-void-deep p-8 transition-all duration-700 hover:border-gold/30"
-                whileHover={{ y: -4 }}
-                transition={{ duration: 0.3 }}
-              >
+          {CIVILIZATIONS.map((civ) => (
+            <Reveal key={civ.id}>
+              <article className="group relative border border-rule bg-void-deep p-8 glow-hover transition-all duration-700">
                 <div className="absolute left-0 top-0 h-1 w-full origin-left scale-x-0 bg-gradient-to-r from-gold/60 to-transparent transition-transform duration-700 group-hover:scale-x-100" />
                 <div className="flex items-start justify-between">
                   <div>
@@ -90,35 +83,48 @@ export default function CivilizationPage() {
                   </div>
                 </div>
                 <div className="mt-6 h-1 w-full bg-rule/30">
-                  <div className="h-full bg-gradient-to-r from-gold/80 to-gold/30" style={{ width: `${civ.health}%` }} />
+                  <div className="h-full bg-gradient-to-r from-gold/80 to-gold/30 transition-all duration-1000" style={{ width: `${civ.health}%` }} />
                 </div>
-              </motion.article>
+              </article>
             </Reveal>
           ))}
         </div>
       </section>
 
-      <ParallaxLayer variant="rings" />
+      <SectionDivider variant="glyph" />
 
-      {/* Agent Cards Grid */}
+      {/* Agent Activity Feed */}
       <section className="section-md mx-auto max-w-[1440px] px-6 md:px-10 lg:px-16">
         <Reveal>
           <div className="mb-20 flex items-baseline gap-6">
-            <span className="label text-gold">The Agents</span>
+            <span className="label text-gold">Live Feed</span>
             <span className="h-px flex-1 bg-rule" />
             <span className="label text-ivory/40">Seven agents at work</span>
           </div>
         </Reveal>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {AGENT_CARDS.map((agent, i) => (
-            <Reveal key={agent.name} delay={i * 0.08}>
-              <Agent3DCard name={agent.name} color={agent.color} role={agent.role} />
-            </Reveal>
-          ))}
+        <div className="grid grid-cols-1 gap-px bg-rule md:grid-cols-2">
+          {AGENT_FEED.map((feed, i) => {
+            const Glyph = AGENT_GLYPHS[feed.icon];
+            return (
+              <Reveal key={i}>
+                <div className="flex items-start gap-4 bg-void-deep p-6 transition-colors duration-500 hover:bg-sapphire/20">
+                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center border border-rule text-gold/70">
+                    <Glyph size={32} stroke="currentColor" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm text-ivory/80">
+                      <span className="text-gold">{feed.agent}</span>
+                      {' '}{feed.action}{' '}
+                      <span className="text-ivory">{feed.target}</span>
+                    </p>
+                    <p className="mt-1 label text-ivory/30">{feed.time}</p>
+                  </div>
+                </div>
+              </Reveal>
+            );
+          })}
         </div>
       </section>
-
-      <ParallaxLayer variant="pyramid" />
 
       <SectionDivider variant="wave" />
 
@@ -134,8 +140,8 @@ export default function CivilizationPage() {
           </Reveal>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {ECOSYSTEM.map((item, i) => (
-              <Reveal key={item.name} delay={i * 0.08}>
-                <div className="group border border-rule bg-void p-8 transition-all duration-700 hover:border-gold/30">
+              <Reveal key={item.name}>
+                <div className="group border border-rule bg-void p-8 transition-all duration-700 hover:border-gold/30 glow-hover">
                   <span className="label text-gold/60">{String(i + 1).padStart(2, '0')}</span>
                   <h4 className="mt-4 font-display text-2xl text-ivory" style={{ fontFamily: 'var(--font-display), serif' }}>{item.name}</h4>
                   <p className="mt-3 text-sm leading-relaxed text-ivory/65" style={{ lineHeight: '1.65' }}>{item.desc}</p>
@@ -145,8 +151,6 @@ export default function CivilizationPage() {
           </div>
         </div>
       </section>
-
-      <ParallaxLayer variant="helix" />
 
       {/* CTA */}
       <section className="section-lg text-center">

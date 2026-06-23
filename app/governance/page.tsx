@@ -1,11 +1,9 @@
-'use client';
 import { Navigation } from '@/components/Navigation';
 import { Reveal } from '@/components/Reveal';
 import { SectionDivider } from '@/components/SectionDivider';
 import { AGENTS } from '@/lib/content';
 import { AgentGlyph } from '@/components/agent-glyphs';
 import { MythMark } from '@/components/glyphs';
-import { motion } from 'framer-motion';
 import Link from 'next/link';
 
 const PROPOSALS = [
@@ -44,17 +42,13 @@ export default function GovernancePage() {
         </Reveal>
 
         <div className="space-y-4">
-          {PROPOSALS.map((proposal, i) => {
+          {PROPOSALS.map((proposal) => {
             const totalVotes = proposal.votes.for + proposal.votes.against;
             const forPercent = (proposal.votes.for / totalVotes) * 100;
 
             return (
-              <Reveal key={proposal.id} delay={i * 0.06}>
-                <motion.article
-                  className="border border-rule bg-void-deep p-6 transition-all duration-500 hover:border-gold/20"
-                  whileHover={{ x: 4 }}
-                  transition={{ duration: 0.2 }}
-                >
+              <Reveal key={proposal.id}>
+                <article className="border border-rule bg-void-deep p-6 transition-all duration-500 hover:border-gold/20">
                   <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3">
@@ -95,7 +89,7 @@ export default function GovernancePage() {
                       </div>
                     </div>
                   </div>
-                </motion.article>
+                </article>
               </Reveal>
             );
           })}
@@ -115,8 +109,8 @@ export default function GovernancePage() {
             </div>
           </Reveal>
           <div className="grid grid-cols-1 gap-px bg-rule md:grid-cols-2 lg:grid-cols-4">
-            {AGENTS.map((agent, i) => (
-              <Reveal key={agent.name} delay={i * 0.05}>
+            {AGENTS.map((agent) => (
+              <Reveal key={agent.name}>
                 <article className="group flex h-full flex-col bg-void-deep p-8 transition-colors duration-700 hover:bg-sapphire/40">
                   <div className="mb-8 text-gold transition-transform duration-700 group-hover:scale-110">
                     <AgentGlyph name={agent.name} size={56} stroke="currentColor" />

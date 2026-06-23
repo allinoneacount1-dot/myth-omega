@@ -7,7 +7,6 @@ import { SectionDivider } from '@/components/SectionDivider';
 import { AGENTS, ECOSYSTEM } from '@/lib/content';
 import { AgentGlyph } from '@/components/agent-glyphs';
 import { MythMark } from '@/components/glyphs';
-import { motion } from 'framer-motion';
 import Link from 'next/link';
 
 export default function ForgePage() {
@@ -93,18 +92,14 @@ export default function ForgePage() {
             </button>
 
             {submitted && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-8 border border-gold/40 bg-gold/5 p-6 text-center"
-              >
+              <div className="mt-8 border border-gold/40 bg-gold/5 p-6 text-center">
                 <p className="font-display text-xl text-gold" style={{ fontFamily: 'var(--font-display), serif' }}>
                   Your world has been forged.
                 </p>
                 <p className="mt-2 text-sm text-ivory/60">
                   The agents are now tending to your creation. Check back soon for the first chapter.
                 </p>
-              </motion.div>
+              </div>
             )}
           </div>
         </Reveal>
@@ -124,8 +119,8 @@ export default function ForgePage() {
           </Reveal>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {ECOSYSTEM.map((item, i) => (
-              <Reveal key={item.name} delay={i * 0.08}>
-                <div className="group border border-rule bg-void p-8 transition-all duration-700 hover:border-gold/30">
+              <Reveal key={item.name}>
+                <div className="group border border-rule bg-void p-8 transition-all duration-700 hover:border-gold/30 glow-hover">
                   <span className="label text-gold/60">{String(i + 1).padStart(2, '0')}</span>
                   <h4 className="mt-4 font-display text-2xl text-ivory" style={{ fontFamily: 'var(--font-display), serif' }}>{item.name}</h4>
                   <p className="mt-3 text-sm leading-relaxed text-ivory/65" style={{ lineHeight: '1.65' }}>{item.desc}</p>
