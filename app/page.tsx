@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 import { CHAPTERS, AGENTS, TOKEN, ECOSYSTEM, FINAL, HERO } from '@/lib/content';
 import { GLYPH_MAP, MythMark } from '@/components/glyphs';
 import { AGENT_GLYPHS } from '@/components/agent-glyphs';
+import { SmoothScroll } from '@/components/SmoothScroll';
 
 const HeroScene = dynamic(() => import('@/components/HeroScene').then(m => m.HeroScene), {
   ssr: false,
@@ -79,8 +80,9 @@ export default function Home() {
   const reduce = usePrefersReducedMotion();
 
   return (
-    <main className="bg-void text-ivory">
-      {/* ── NAV ── */}
+    <SmoothScroll>
+      <main className="bg-void text-ivory">
+        {/* ── NAV ── */}
       <nav className="fixed left-0 right-0 top-0 z-50 border-b border-transparent bg-void/70 backdrop-blur-md">
         <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-5 md:px-10 lg:px-16">
           <a href="#top" className="flex items-center gap-3">
@@ -301,6 +303,7 @@ export default function Home() {
           </Reveal>
         </div>
       </footer>
-    </main>
+      </main>
+    </SmoothScroll>
   );
 }
