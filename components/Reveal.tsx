@@ -1,7 +1,7 @@
 'use client';
 
-import { motion, useReducedMotion } from 'framer-motion';
-import { type ReactNode } from 'react';
+import { motion } from 'framer-motion';
+import { type ReactNode, useState, useEffect } from 'react';
 
 interface RevealProps {
   children: ReactNode;
@@ -10,8 +10,20 @@ interface RevealProps {
   className?: string;
 }
 
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReduced(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setReduced(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+  return reduced;
+}
+
 export function Reveal({ children, delay = 0, y = 32, className = '' }: RevealProps) {
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
   if (reduce) return <div className={className}>{children}</div>;
 
   return (

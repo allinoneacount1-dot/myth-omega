@@ -1,7 +1,8 @@
 'use client';
 
+import { Suspense, useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { HERO } from '@/lib/content';
 import { MythMark } from '@/components/glyphs';
 
@@ -10,8 +11,21 @@ const HeroScene = dynamic(() => import('./HeroScene').then(m => m.HeroScene), {
   loading: () => <div className="absolute inset-0 bg-void" />,
 });
 
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReduced(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setReduced(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+  return reduced;
+}
+
 export function Hero() {
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
+
   const stagger = (i: number) => ({
     initial: { opacity: 0, y: 28 },
     animate: { opacity: 1, y: 0 },
@@ -24,9 +38,11 @@ export function Hero() {
 
   return (
     <section className="relative h-[100vh] min-h-[720px] w-full overflow-hidden">
-      {/* R3F background */}
+      {/* R3F background — wrapped in Suspense */}
       <div className="absolute inset-0">
-        <HeroScene />
+        <Suspense fallback={<div className="absolute inset-0 bg-void" />}>
+          <HeroScene />
+        </Suspense>
       </div>
 
       {/* Vignette */}
@@ -41,10 +57,7 @@ export function Hero() {
       {/* Content */}
       <div className="relative z-10 mx-auto flex h-full max-w-[1440px] flex-col justify-between px-6 py-12 md:px-10 lg:px-16">
         {/* Top bar */}
-        <motion.div
-          {...stagger(0)}
-          className="flex items-center justify-between"
-        >
+        <motion.div {...stagger(0)} className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <MythMark size={36} stroke="#F7F4EE" />
             <span className="label text-ivory">MYTH</span>
@@ -58,10 +71,7 @@ export function Hero() {
             <span className="label text-gold">{HERO.eyebrow}</span>
           </motion.div>
 
-          <motion.h1
-            {...stagger(2)}
-            className="headline-hero mt-6 text-ivory"
-          >
+          <motion.h1 {...stagger(2)} className="headline-hero mt-6 text-ivory">
             MYTH
           </motion.h1>
 
@@ -73,19 +83,13 @@ export function Hero() {
             {HERO.manifesto}
           </motion.p>
 
-          <motion.p
-            {...stagger(4)}
-            className="label mt-12 text-ivory/55"
-          >
+          <motion.p {...stagger(4)} className="label mt-12 text-ivory/55">
             {HERO.chapterLine}
           </motion.p>
         </div>
 
         {/* Bottom — scroll indicator */}
-        <motion.div
-          {...stagger(5)}
-          className="flex items-center justify-between"
-        >
+        <motion.div {...stagger(5)} className="flex items-center justify-between">
           <span className="label text-ivory/40">Scroll to begin</span>
           <motion.div
             animate={reduce ? {} : { y: [0, 8, 0] }}
