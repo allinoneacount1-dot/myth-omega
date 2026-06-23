@@ -1,8 +1,11 @@
 import { CHAPTERS, AGENTS, TOKEN, ECOSYSTEM, FINAL, HERO } from '@/lib/content';
 import { GLYPH_MAP, MythMark } from '@/components/glyphs';
 import { AGENT_GLYPHS } from '@/components/agent-glyphs';
-import { Reveal } from '@/components/Reveal';
-import { StaggerContainer, StaggerItem } from '@/components/Stagger';
+import dynamic from 'next/dynamic';
+
+const Reveal = dynamic(() => import('@/components/Reveal').then(m => m.Reveal), { ssr: false });
+const StaggerContainer = dynamic(() => import('@/components/Stagger').then(m => m.StaggerContainer), { ssr: false });
+const StaggerItem = dynamic(() => import('@/components/Stagger').then(m => m.StaggerItem), { ssr: false });
 import { Hero } from '@/components/Hero';
 
 export default function Home() {

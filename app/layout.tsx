@@ -8,7 +8,9 @@ export const metadata: Metadata = {
   title: 'MYTH — The Culture Engine',
   description: 'Build worlds that outlive you. The first Culture Engine for persistent digital civilizations.',
   icons: {
-    icon: '/favicon.svg',
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
   },
 };
 
@@ -21,6 +23,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+      </head>
       <body className="bg-void text-ivory antialiased">
         <PageReveal>
           <SmoothScroll>
