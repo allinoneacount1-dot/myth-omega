@@ -3,6 +3,7 @@ import './globals.css';
 import { SmoothScroll } from '@/components/SmoothScroll';
 import { PageReveal } from '@/components/PageReveal';
 import { ScrollProgress } from '@/components/ScrollProgress';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 export const metadata: Metadata = {
   title: 'MYTH — The Culture Engine',
@@ -27,12 +28,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </head>
       <body className="bg-void text-ivory antialiased">
-        <PageReveal>
-          <SmoothScroll>
-            <ScrollProgress />
-            {children}
-          </SmoothScroll>
-        </PageReveal>
+        <ErrorBoundary>
+          <PageReveal>
+            <SmoothScroll>
+              <ScrollProgress />
+              {children}
+            </SmoothScroll>
+          </PageReveal>
+        </ErrorBoundary>
       </body>
     </html>
   );
