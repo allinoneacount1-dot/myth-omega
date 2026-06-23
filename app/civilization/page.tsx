@@ -45,7 +45,7 @@ export default function CivilizationPage() {
         <Reveal>
           <span className="label text-gold">The Living World</span>
           <h1 className="headline-hero mt-6 text-ivory">Civilizations</h1>
-          <p className="mx-auto mt-8 max-w-2xl font-display text-xl italic text-ivory/70" style={{ fontFamily: 'var(--font-display), serif' }}>
+          <p className="mx-auto mt-8 max-w-2xl font-display text-lg italic text-ivory/70 md:text-xl" style={{ fontFamily: 'var(--font-display), serif', lineHeight: '1.5' }}>
             Each civilization is a living canon — written by its people, tended by its agents, preserved for the long arc of inheritance.
           </p>
         </Reveal>
@@ -61,7 +61,7 @@ export default function CivilizationPage() {
                 <div className="flex items-start justify-between">
                   <div>
                     <span className="label text-ivory/40">#{String(civ.id).padStart(3, '0')}</span>
-                    <h3 className="mt-3 font-display text-2xl text-ivory" style={{ fontFamily: 'var(--font-display), serif' }}>{civ.name}</h3>
+                    <h3 className="mt-3 font-display text-xl text-ivory md:text-2xl" style={{ fontFamily: 'var(--font-display), serif' }}>{civ.name}</h3>
                     <p className="mt-1 label text-ivory/50">{civ.genre}</p>
                   </div>
                   <div className="flex h-12 w-12 items-center justify-center border border-rule">
@@ -112,7 +112,7 @@ export default function CivilizationPage() {
                     <Glyph size={32} stroke="currentColor" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm text-ivory/80">
+                    <p className="text-base text-ivory/80" style={{ lineHeight: '1.7' }}>
                       <span className="text-gold">{feed.agent}</span>
                       {' '}{feed.action}{' '}
                       <span className="text-ivory">{feed.target}</span>
@@ -144,7 +144,7 @@ export default function CivilizationPage() {
                 <div className="group border border-rule bg-void p-8 transition-all duration-700 hover:border-gold/30 glow-hover">
                   <span className="label text-gold/60">{String(i + 1).padStart(2, '0')}</span>
                   <h4 className="mt-4 font-display text-2xl text-ivory" style={{ fontFamily: 'var(--font-display), serif' }}>{item.name}</h4>
-                  <p className="mt-3 text-sm leading-relaxed text-ivory/65" style={{ lineHeight: '1.65' }}>{item.desc}</p>
+                  <p className="mt-3 text-sm leading-relaxed text-ivory/65" style={{ lineHeight: '1.7' }}>{item.desc}</p>
                 </div>
               </Reveal>
             ))}
@@ -157,7 +157,7 @@ export default function CivilizationPage() {
         <Reveal>
           <MythMark size={60} stroke="#D8B36A" className="mx-auto mb-8" />
           <h2 className="headline-section text-ivory">Build Your Own Civilization</h2>
-          <p className="mx-auto mt-6 max-w-xl font-display text-lg italic text-ivory/70" style={{ fontFamily: 'var(--font-display), serif' }}>
+          <p className="mx-auto mt-6 max-w-xl font-display text-base italic text-ivory/70 md:text-lg" style={{ fontFamily: 'var(--font-display), serif', lineHeight: '1.6' }}>
             Enter the Canon Forge. Create worlds that outlive you.
           </p>
           <Link href="/forge" className="label mt-10 inline-flex items-center gap-3 border border-gold px-10 py-5 text-gold transition-all duration-700 hover:bg-gold hover:text-void">
