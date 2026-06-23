@@ -1,5 +1,5 @@
 import { AGENTS } from '@/lib/content';
-import { AGENT_GLYPHS } from '@/components/agent-glyphs';
+import { AgentGlyph } from '@/components/agent-glyphs';
 import { MythMark } from '@/components/glyphs';
 import { Reveal } from '@/components/Reveal';
 import Link from 'next/link';
@@ -42,7 +42,7 @@ export default function AgentsPage() {
       <section className="section-md mx-auto max-w-[1440px] px-6 md:px-10 lg:px-16">
         <div className="grid grid-cols-1 gap-px bg-rule md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {AGENTS.map((agent, i) => {
-            const Glyph = AGENT_GLYPHS[agent.name];
+            const Glyph = AgentGlyph;
             return (
               <Reveal key={agent.name} delay={0.05 * i}>
                 <article className="group flex h-full flex-col bg-void-deep p-8 transition-colors duration-700 hover:bg-sapphire/40">
@@ -50,7 +50,7 @@ export default function AgentsPage() {
                     <span className="label text-gold/60">{String(i + 1).padStart(2, '0')}</span>
                     <span className="label text-ivory/30">{agent.role}</span>
                   </div>
-                  <div className="mb-10 text-gold transition-transform duration-700 group-hover:scale-110"><Glyph size={72} stroke="currentColor" /></div>
+                  <div className="mb-10 text-gold transition-transform duration-700 group-hover:scale-110"><Glyph name={agent.name} size={72} stroke="currentColor" /></div>
                   <h4 className="font-display text-3xl text-ivory" style={{ fontFamily: 'var(--font-display), serif' }}>{agent.name}</h4>
                   <p className="mt-4 flex-1 text-sm leading-relaxed text-ivory/70" style={{ lineHeight: '1.65' }}>{agent.desc}</p>
                   <div className="mt-8 h-px w-12 bg-gold/30 transition-all duration-700 group-hover:w-full" />

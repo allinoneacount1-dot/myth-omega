@@ -1,8 +1,8 @@
 import { CHAPTERS, AGENTS, TOKEN, ECOSYSTEM, FINAL, HERO } from '@/lib/content';
 import { GLYPH_MAP, MythMark } from '@/components/glyphs';
-import { AGENT_GLYPHS } from '@/components/agent-glyphs';
+import { AgentGlyph } from '@/components/agent-glyphs';
 import { Reveal } from '@/components/Reveal';
-import { StaggerContainer, StaggerItem } from '@/components/Stagger';
+import { SectionDivider } from '@/components/SectionDivider';
 import { Hero } from '@/components/Hero';
 import { Navigation } from '@/components/Navigation';
 
@@ -10,8 +10,9 @@ export default function Home() {
   return (
     <main className="bg-void text-ivory">
       <Navigation />
-
       <Hero />
+
+      <SectionDivider variant="particles" />
 
       {/* CHAPTERS */}
       {CHAPTERS.map((chapter) => {
@@ -53,6 +54,8 @@ export default function Home() {
         );
       })}
 
+      <SectionDivider variant="glyph" flip />
+
       {/* AGENTS */}
       <section id="agents" className="section-md bg-void-deep">
         <div className="mx-auto max-w-[1440px] px-6 md:px-10 lg:px-16">
@@ -71,7 +74,7 @@ export default function Home() {
           </Reveal>
           <div className="mt-24 grid grid-cols-1 gap-px bg-rule md:grid-cols-2 lg:grid-cols-4">
             {AGENTS.map((agent, i) => {
-              const Glyph = AGENT_GLYPHS[agent.name];
+              const Glyph = AgentGlyph;
               return (
                 <Reveal key={agent.name} delay={0.05 * i}>
                   <article className="group flex h-full flex-col bg-void-deep p-8 transition-colors duration-700 hover:bg-sapphire/40">
@@ -79,7 +82,7 @@ export default function Home() {
                       <span className="label text-gold/60">{String(i + 1).padStart(2, '0')}</span>
                       <span className="label text-ivory/30">{agent.role}</span>
                     </div>
-                    <div className="mb-10 text-gold transition-transform duration-700 group-hover:scale-110"><Glyph size={72} stroke="currentColor" /></div>
+                    <div className="mb-10 text-gold transition-transform duration-700 group-hover:scale-110"><Glyph name={agent.name} size={72} stroke="currentColor" /></div>
                     <h4 className="font-display text-3xl text-ivory" style={{ fontFamily: 'var(--font-display), serif' }}>{agent.name}</h4>
                     <p className="mt-4 flex-1 text-sm leading-relaxed text-ivory/70" style={{ lineHeight: '1.65' }}>{agent.desc}</p>
                     <div className="mt-8 h-px w-12 bg-gold/30 transition-all duration-700 group-hover:w-full" />
@@ -90,6 +93,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <SectionDivider variant="wave" />
 
       {/* TOKEN */}
       <section id="token" className="section-md">
@@ -128,6 +133,8 @@ export default function Home() {
         </div>
       </section>
 
+      <SectionDivider variant="particles" flip />
+
       {/* ECOSYSTEM */}
       <section className="section-md bg-void-deep">
         <div className="mx-auto max-w-[1440px] px-6 md:px-10 lg:px-16">
@@ -152,6 +159,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <SectionDivider variant="glyph" />
 
       {/* FINAL CTA */}
       <section id="enter" className="section-lg">

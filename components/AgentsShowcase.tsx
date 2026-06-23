@@ -2,7 +2,7 @@
 
 import { Reveal } from './Reveal';
 import { AGENTS } from '@/lib/content';
-import { AGENT_GLYPHS } from './agent-glyphs';
+import { AgentGlyph } from './agent-glyphs';
 
 export function AgentsShowcase() {
   return (
@@ -31,7 +31,7 @@ export function AgentsShowcase() {
 
         <div className="mt-24 grid grid-cols-1 gap-px bg-rule md:grid-cols-2 lg:grid-cols-4">
           {AGENTS.map((agent, i) => {
-            const Glyph = AGENT_GLYPHS[agent.name];
+            const Glyph = AgentGlyph;
             return (
               <Reveal key={agent.name} delay={0.1 * i}>
                 <article className="group relative flex h-full flex-col bg-void-deep p-8 transition-colors duration-700 hover:bg-sapphire/40">
@@ -45,7 +45,7 @@ export function AgentsShowcase() {
 
                   {/* Glyph */}
                   <div className="mb-10 text-gold transition-transform duration-700 group-hover:scale-110">
-                    <Glyph size={72} stroke="currentColor" />
+                    <Glyph name={agent.name} size={72} stroke="currentColor" />
                   </div>
 
                   {/* Name */}
