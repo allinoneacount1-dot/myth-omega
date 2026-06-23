@@ -19,13 +19,14 @@ export function Navigation() {
             <span className="label text-ivory">MYTH</span>
           </Link>
           <div className="hidden items-center gap-8 md:flex lg:gap-10">
-            {CHAPTERS.slice(0, 3).map((c) => (
-              <a key={c.index} href={`#chapter-${c.index}`} className="label text-ivory/55 transition-colors duration-500 hover:text-gold">{c.title}</a>
-            ))}
+            <a href="#chapter-1" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Genesis</a>
+            <span className="text-ivory/20">/</span>
+            <a href="#chapter-2" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Birth</a>
+            <span className="text-ivory/20">/</span>
+            <a href="#chapter-3" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Rise</a>
+            <span className="text-ivory/20">·</span>
             <Link href="/agents" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Agents</Link>
-            <Link href="/token" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">$MYTH</Link>
-            <Link href="/whitepaper" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Whitepaper</Link>
-            <Link href="/civilization" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Civilizations</Link>
+            <Link href="/civilization" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Worlds</Link>
             <Link href="/governance" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Governance</Link>
           </div>
           <div className="flex items-center gap-4">
