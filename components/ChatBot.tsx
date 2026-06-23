@@ -182,10 +182,10 @@ export function ChatBot() {
       {/* Chat Modal */}
       {isOpen && (
         <div
-          className="fixed bottom-24 right-6 z-[99] flex flex-col border border-rule bg-void-deep backdrop-blur-xl"
+          className="fixed bottom-24 right-6 z-[99] flex flex-col overflow-hidden border border-rule bg-void-deep backdrop-blur-xl"
           style={{
             width: 'min(420px, calc(100vw - 48px))',
-            maxHeight: 'min(600px, calc(100vh - 200px))',
+            height: 'min(600px, calc(100vh - 200px))',
             borderRadius: '12px',
             boxShadow: '0 24px 64px rgba(0,0,0,0.6), 0 0 40px rgba(216,179,106,0.08)',
           }}
@@ -279,7 +279,7 @@ export function ChatBot() {
           )}
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4" style={{ minHeight: '200px' }}>
+          <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-4 space-y-4">
             {messages.map((msg) => (
               <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div
