@@ -33,6 +33,12 @@ export default function WhitepaperPage() {
             <p className="mx-auto mt-8 max-w-2xl font-display text-xl italic text-ivory/85 md:text-2xl" style={{ fontFamily: 'var(--font-display), serif' }}>
               The architecture of a civilization that intends to be remembered.
             </p>
+            <a
+              href="/api/whitepaper"
+              className="label mt-8 inline-flex items-center gap-3 border border-gold px-8 py-4 text-gold transition-all duration-700 hover:bg-gold hover:text-void"
+            >
+              📄 Download Whitepaper (Markdown)
+            </a>
           </Reveal>
         </div>
       </section>

@@ -6,45 +6,36 @@ import { MythMark } from '@/components/glyphs';
 import { SectionDivider } from '@/components/SectionDivider';
 import { Reveal } from '@/components/Reveal';
 
-interface MarketData {
+interface CryptoPrice {
+  symbol: string;
+  name: string;
   price: number;
-  priceChange24h: number;
+  change24h: number;
+  change7d: number;
   marketCap: number;
-  fullyDilutedValuation: number;
   volume24h: number;
-  liquidity: number;
+}
+
+interface SolanaNetwork {
+  currentSlot: number;
+  avgTps: number;
   circulatingSupply: number;
   totalSupply: number;
-  allTimeHigh: number;
-  allTimeLow: number;
+  source: string;
 }
 
-interface PricePoint {
-  date: string;
-  price: number;
-  volume: number;
-}
-
-interface HolderTier {
-  tier: string;
-  count: number;
-  share: number;
-}
-
-interface OnChainMetric {
-  metric: string;
-  value: string | number;
-  change: number;
-}
-
-interface CivFlow {
-  name: string;
-  inflow: number;
-  outflow: number;
-  net: number;
+interface GlobalMarket {
+  totalMarketCap: number;
+  totalVolume: number;
+  btcDominance: number;
+  ethDominance: number;
+  marketCapChange24h: number;
+  activeCryptocurrencies: number;
+  markets: number;
 }
 
 function formatNumber(n: number): string {
+  if (n >= 1e12) return `$${(n / 1e12).toFixed(2)}T`;
   if (n >= 1e9) return `$${(n / 1e9).toFixed(2)}B`;
   if (n >= 1e6) return `$${(n / 1e6).toFixed(2)}M`;
   if (n >= 1e3) return `$${(n / 1e3).toFixed(1)}K`;
@@ -52,132 +43,85 @@ function formatNumber(n: number): string {
 }
 
 function formatPrice(p: number): string {
-  if (p < 0.01) return `$${p.toFixed(6)}`;
-  if (p < 1) return `$${p.toFixed(4)}`;
-  return `$${p.toFixed(2)}`;
+  if (p >= 1000) return `$${p.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  if (p >= 1) return `$${p.toFixed(2)}`;
+  if (p >= 0.01) return `$${p.toFixed(4)}`;
+  return `$${p.toFixed(6)}`;
 }
 
-function MiniChart({ data, color = '#D8B36A' }: { data: PricePoint[]; color?: string }) {
-  if (data.length < 2) return null;
-  const prices = data.map((d) => d.price);
-  const min = Math.min(...prices);
-  const max = Math.max(...prices);
-  const range = max - min || 1;
-  const width = 100;
-  const height = 40;
-
-  const points = prices.map((p, i) => {
-    const x = (i / (prices.length - 1)) * width;
-    const y = height - ((p - min) / range) * height;
-    return `${x},${y}`;
-  });
-
-  return (
-    <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-10" preserveAspectRatio="none">
-      <defs>
-        <linearGradient id={`chartGrad-${color.replace('#', '')}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity="0.3" />
-          <stop offset="100%" stopColor={color} stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <polygon
-        points={`0,${height} ${points.join(' ')} ${width},${height}`}
-        fill={`url(#chartGrad-${color.replace('#', '')})`}
-      />
-      <polyline
-        points={points.join(' ')}
-        fill="none"
-        stroke={color}
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
+function formatLargeNumber(n: number): string {
+  if (n >= 1e9) return `${(n / 1e9).toFixed(1)}B`;
+  if (n >= 1e6) return `${(n / 1e6).toFixed(1)}M`;
+  if (n >= 1e3) return `${(n / 1e3).toFixed(1)}K`;
+  return n.toLocaleString();
 }
 
-function StatCard({ label, value, change, prefix = '' }: { label: string; value: string | number; change?: number; prefix?: string }) {
-  const isPositive = change !== undefined && change > 0;
-  const isNegative = change !== undefined && change < 0;
-
+function ChangeIndicator({ value }: { value: number }) {
+  const isPositive = value > 0;
+  const isNegative = value < 0;
   return (
-    <div className="border border-rule bg-void-deep p-5 transition-all duration-500 hover:border-gold/20">
-      <span className="label text-ivory/40">{label}</span>
-      <p className="mt-2 font-mono text-xl text-ivory">
-        {prefix}{typeof value === 'number' ? value.toLocaleString() : value}
-      </p>
-      {change !== undefined && (
-        <p className={`mt-1 label ${isPositive ? 'text-teal' : isNegative ? 'text-ember' : 'text-ivory/40'}`}>
-          {isPositive ? '↑' : isNegative ? '↓' : '→'} {Math.abs(change).toFixed(1)}%
-        </p>
-      )}
-    </div>
+    <span className={`label ${isPositive ? 'text-teal' : isNegative ? 'text-ember' : 'text-ivory/40'}`}>
+      {isPositive ? '↑' : isNegative ? '↓' : '→'} {Math.abs(value).toFixed(2)}%
+    </span>
   );
 }
 
 export default function AnalyticsPage() {
-  const [data, setData] = useState<{
-    market: MarketData;
-    priceHistory: PricePoint[];
-    holderTiers: HolderTier[];
-    onChainActivity: OnChainMetric[];
-    civFlows: CivFlow[];
-    lastUpdated: string;
-  } | null>(null);
+  const [prices, setPrices] = useState<CryptoPrice[]>([]);
+  const [network, setNetwork] = useState<SolanaNetwork | null>(null);
+  const [market, setMarket] = useState<GlobalMarket | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [chartRange, setChartRange] = useState<'7d' | '14d' | '30d'>('30d');
+  const [lastUpdated, setLastUpdated] = useState<string>('');
+  const [refreshing, setRefreshing] = useState(false);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (showRefresh = false) => {
+    if (showRefresh) setRefreshing(true);
     try {
-      const res = await fetch('/api/analytics');
+      const res = await fetch('/api/analytics?type=all');
       if (!res.ok) throw new Error('Failed to fetch');
-      const json = await res.json();
-      setData(json);
+      const data = await res.json();
+      setPrices(data.cryptoPrices || []);
+      setNetwork(data.solanaNetwork || null);
+      setMarket(data.globalMarket || null);
+      setLastUpdated(data.timestamp);
       setError('');
     } catch {
-      setError('Analytics temporarily unavailable');
+      setError('Real-time data temporarily unavailable. Using cached values.');
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, []);
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 60000);
+    const interval = setInterval(() => fetchData(true), 60_000); // Refresh every 60s
     return () => clearInterval(interval);
   }, [fetchData]);
 
-  const chartData = data?.priceHistory
-    ? chartRange === '7d'
-      ? data.priceHistory.slice(-7)
-      : chartRange === '14d'
-      ? data.priceHistory.slice(-14)
-      : data.priceHistory
-    : [];
-
-  const priceChangeColor = data?.market.priceChange24h
-    ? data.market.priceChange24h >= 0
-      ? '#00B4A8'
-      : '#A33A4A'
-    : '#D8B36A';
+  // Find SOL price for MYTH ecosystem context
+  const solPrice = prices.find((p) => p.symbol === 'SOL');
 
   return (
-    <main className="bg-void text-ivory">
+    <main className="bg-void text-ivory min-h-screen">
       <Navigation />
       <SectionDivider variant="particles" />
 
       {/* Hero */}
       <section className="section-sm pt-40 text-center">
         <Reveal>
-          <span className="label text-gold">Market Intelligence</span>
-          <h1 className="headline-hero mt-6 text-ivory">$MYTH Analytics</h1>
-          <p
-            className="mx-auto mt-6 max-w-2xl font-display text-lg italic text-ivory/70 md:text-xl"
-            style={{ fontFamily: 'var(--font-display), serif' }}
-          >
-            Real-time token metrics, on-chain activity, and civilization capital flows.
+          <span className="label text-gold">Real-Time Intelligence</span>
+          <h1 className="headline-hero mt-6 text-ivory">Market Analytics</h1>
+          <p className="mx-auto mt-6 max-w-2xl font-display text-lg italic text-ivory/70 md:text-xl" style={{ fontFamily: 'var(--font-display), serif' }}>
+            Live crypto prices, Solana network stats, and global market data — powered by free public APIs.
           </p>
+          {lastUpdated && (
+            <p className="mt-4 label text-ivory/30">
+              Last updated: {new Date(lastUpdated).toLocaleString()}
+              {refreshing && <span className="ml-2 text-gold">● refreshing...</span>}
+            </p>
+          )}
         </Reveal>
       </section>
 
@@ -185,242 +129,225 @@ export default function AnalyticsPage() {
         <div className="section-md text-center">
           <div className="inline-flex items-center gap-3">
             <MythMark size={24} stroke="#D8B36A" />
-            <span className="label text-ivory/50">Loading market data...</span>
+            <span className="label text-ivory/50">Loading real-time data...</span>
           </div>
         </div>
       )}
 
       {error && (
-        <div className="section-md text-center">
-          <p className="text-ember">{error}</p>
+        <div className="section-sm text-center">
+          <p className="text-ember/70 text-sm">{error}</p>
         </div>
       )}
 
-      {data && (
+      {!loading && (
         <>
-          {/* Price Hero */}
+          {/* ─── Crypto Prices ─────────────────────────────── */}
           <section className="section-sm mx-auto max-w-[1440px] px-6 md:px-10 lg:px-16">
             <Reveal>
-              <div className="border border-rule bg-void-deep p-8 md:p-12">
-                <div className="flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
-                  <div>
-                    <span className="label text-ivory/40">Current Price</span>
-                    <div className="mt-2 flex items-baseline gap-4">
-                      <h2 className="font-display text-5xl text-ivory" style={{ fontFamily: 'var(--font-display), serif' }}>
-                        {formatPrice(data.market.price)}
-                      </h2>
-                      <span className={`label text-lg ${data.market.priceChange24h >= 0 ? 'text-teal' : 'text-ember'}`}>
-                        {data.market.priceChange24h >= 0 ? '+' : ''}{data.market.priceChange24h}%
-                      </span>
-                    </div>
-                    <div className="mt-4 flex items-center gap-4">
-                      <span className="label text-ivory/40">
-                        ATH: {formatPrice(data.market.allTimeHigh)}
-                      </span>
-                      <span className="label text-ivory/40">
-                        ATL: {formatPrice(data.market.allTimeLow)}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="w-full md:w-64">
-                    <MiniChart data={chartData} color={priceChangeColor} />
-                    <div className="mt-2 flex justify-center gap-2">
-                      {(['7d', '14d', '30d'] as const).map((range) => (
-                        <button
-                          key={range}
-                          onClick={() => setChartRange(range)}
-                          className={`label px-3 py-1 ${
-                            chartRange === range ? 'text-gold border-gold/40 border' : 'text-ivory/40'
-                          }`}
-                        >
-                          {range}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+              <div className="mb-8 flex items-baseline gap-6">
+                <span className="label text-gold">Crypto Prices</span>
+                <span className="h-px flex-1 bg-rule" />
+                <span className="label text-ivory/30">Live • CoinGecko</span>
               </div>
             </Reveal>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              {prices.map((coin, i) => (
+                <Reveal key={coin.symbol} delay={i * 0.08}>
+                  <div className="border border-rule bg-void-deep p-6 transition-all duration-500 hover:border-gold/20">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="font-display text-xl text-ivory" style={{ fontFamily: 'var(--font-display), serif' }}>{coin.name}</h3>
+                        <p className="label text-ivory/40">{coin.symbol}</p>
+                      </div>
+                      <ChangeIndicator value={coin.change24h} />
+                    </div>
+                    <p className="mt-4 font-mono text-2xl text-ivory">
+                      {coin.price > 0 ? formatPrice(coin.price) : '—'}
+                    </p>
+                    {coin.price > 0 && (
+                      <div className="mt-4 grid grid-cols-2 gap-3 border-t border-rule pt-3">
+                        <div>
+                          <p className="label text-ivory/30">7d Change</p>
+                          <ChangeIndicator value={coin.change7d} />
+                        </div>
+                        <div>
+                          <p className="label text-ivory/30">Volume 24h</p>
+                          <p className="font-mono text-sm text-ivory/70">{formatNumber(coin.volume24h)}</p>
+                        </div>
+                      </div>
+                    )}
+                    {coin.price === 0 && (
+                      <p className="mt-4 label text-amber/50 text-xs">API rate limit reached — data will refresh automatically</p>
+                    )}
+                  </div>
+                </Reveal>
+              ))}
+            </div>
           </section>
 
           <SectionDivider variant="glyph" />
 
-          {/* Market Stats Grid */}
+          {/* ─── Solana Network ────────────────────────────── */}
           <section className="section-sm mx-auto max-w-[1440px] px-6 md:px-10 lg:px-16">
             <Reveal>
               <div className="mb-8 flex items-baseline gap-6">
-                <span className="label text-gold">Market Overview</span>
+                <span className="label text-gold">Solana Network</span>
                 <span className="h-px flex-1 bg-rule" />
+                <span className="label text-ivory/30">Live • Public RPC</span>
               </div>
             </Reveal>
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-              <Reveal>
-                <StatCard label="Market Cap" value={formatNumber(data.market.marketCap)} />
-              </Reveal>
-              <Reveal>
-                <StatCard label="Fully Diluted Valuation" value={formatNumber(data.market.fullyDilutedValuation)} />
-              </Reveal>
-              <Reveal>
-                <StatCard label="24h Volume" value={formatNumber(data.market.volume24h)} />
-              </Reveal>
-              <Reveal>
-                <StatCard label="Liquidity" value={formatNumber(data.market.liquidity)} />
-              </Reveal>
-              <Reveal>
-                <StatCard label="Circulating Supply" value={`${(data.market.circulatingSupply / 1e6).toFixed(0)}M MYTH`} />
-              </Reveal>
-              <Reveal>
-                <StatCard label="Total Supply" value={`${(data.market.totalSupply / 1e9).toFixed(1)}B MYTH`} />
-              </Reveal>
-              <Reveal>
-                <StatCard label="From ATH" value={`${(((data.market.price - data.market.allTimeHigh) / data.market.allTimeHigh) * 100).toFixed(1)}%`} />
-              </Reveal>
-              <Reveal>
-                <StatCard label="From ATL" value={`${(((data.market.price - data.market.allTimeLow) / data.market.allTimeLow) * 100).toFixed(1)}%`} />
-              </Reveal>
-            </div>
+            {network && (
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                <Reveal>
+                  <div className="border border-rule bg-void-deep p-6 text-center">
+                    <p className="label text-ivory/40">Current Slot</p>
+                    <p className="mt-2 font-mono text-xl text-ivory">{formatLargeNumber(network.currentSlot)}</p>
+                  </div>
+                </Reveal>
+                <Reveal>
+                  <div className="border border-rule bg-void-deep p-6 text-center">
+                    <p className="label text-ivory/40">Avg TPS</p>
+                    <p className="mt-2 font-mono text-xl text-ivory">{network.avgTps.toLocaleString()}</p>
+                  </div>
+                </Reveal>
+                <Reveal>
+                  <div className="border border-rule bg-void-deep p-6 text-center">
+                    <p className="label text-ivory/40">SOL Price</p>
+                    <p className="mt-2 font-mono text-xl text-ivory">{solPrice?.price ? formatPrice(solPrice.price) : '—'}</p>
+                  </div>
+                </Reveal>
+                <Reveal>
+                  <div className="border border-rule bg-void-deep p-6 text-center">
+                    <p className="label text-ivory/40">Circulating Supply</p>
+                    <p className="mt-2 font-mono text-xl text-ivory">{formatLargeNumber(network.circulatingSupply)} SOL</p>
+                  </div>
+                </Reveal>
+              </div>
+            )}
           </section>
 
           <SectionDivider variant="wave" />
 
-          {/* On-Chain Activity */}
+          {/* ─── Global Market ─────────────────────────────── */}
           <section className="section-sm mx-auto max-w-[1440px] px-6 md:px-10 lg:px-16">
             <Reveal>
               <div className="mb-8 flex items-baseline gap-6">
-                <span className="label text-gold">On-Chain Activity</span>
+                <span className="label text-gold">Global Market</span>
                 <span className="h-px flex-1 bg-rule" />
-                <span className="label text-ivory/40">24h</span>
+                <span className="label text-ivory/30">Live • CoinGecko</span>
               </div>
             </Reveal>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {data.onChainActivity.map((metric, i) => (
-                <Reveal key={metric.metric} delay={i * 0.05}>
-                  <StatCard
-                    label={metric.metric}
-                    value={metric.value}
-                    change={metric.change}
-                  />
+            {market && (
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+                <Reveal>
+                  <div className="border border-rule bg-void-deep p-6 text-center">
+                    <p className="label text-ivory/40">Total Market Cap</p>
+                    <p className="mt-2 font-mono text-lg text-ivory">{formatNumber(market.totalMarketCap)}</p>
+                    <div className="mt-1">
+                      <ChangeIndicator value={market.marketCapChange24h} />
+                    </div>
+                  </div>
                 </Reveal>
-              ))}
-            </div>
+                <Reveal>
+                  <div className="border border-rule bg-void-deep p-6 text-center">
+                    <p className="label text-ivory/40">24h Volume</p>
+                    <p className="mt-2 font-mono text-lg text-ivory">{formatNumber(market.totalVolume)}</p>
+                  </div>
+                </Reveal>
+                <Reveal>
+                  <div className="border border-rule bg-void-deep p-6 text-center">
+                    <p className="label text-ivory/40">BTC Dominance</p>
+                    <p className="mt-2 font-mono text-lg text-ivory">{market.btcDominance.toFixed(1)}%</p>
+                  </div>
+                </Reveal>
+                <Reveal>
+                  <div className="border border-rule bg-void-deep p-6 text-center">
+                    <p className="label text-ivory/40">ETH Dominance</p>
+                    <p className="mt-2 font-mono text-lg text-ivory">{market.ethDominance.toFixed(1)}%</p>
+                  </div>
+                </Reveal>
+                <Reveal>
+                  <div className="border border-rule bg-void-deep p-6 text-center">
+                    <p className="label text-ivory/40">Active Cryptos</p>
+                    <p className="mt-2 font-mono text-lg text-ivory">{formatLargeNumber(market.activeCryptocurrencies)}</p>
+                  </div>
+                </Reveal>
+                <Reveal>
+                  <div className="border border-rule bg-void-deep p-6 text-center">
+                    <p className="label text-ivory/40">Markets</p>
+                    <p className="mt-2 font-mono text-lg text-ivory">{formatLargeNumber(market.markets)}</p>
+                  </div>
+                </Reveal>
+              </div>
+            )}
           </section>
 
           <SectionDivider variant="particles" flip />
 
-          {/* Holder Distribution */}
+          {/* ─── Data Sources ──────────────────────────────── */}
           <section className="section-sm mx-auto max-w-[1440px] px-6 md:px-10 lg:px-16">
             <Reveal>
-              <div className="mb-8 flex items-baseline gap-6">
-                <span className="label text-gold">Holder Distribution</span>
-                <span className="h-px flex-1 bg-rule" />
-              </div>
-            </Reveal>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-5">
-              {data.holderTiers.map((tier, i) => (
-                <Reveal key={tier.tier} delay={i * 0.05}>
-                  <div className="border border-rule bg-void-deep p-5 text-center transition-all duration-500 hover:border-gold/20">
-                    <span className="label text-ivory/40">{tier.tier}</span>
-                    <p className="mt-3 font-mono text-2xl text-ivory">{tier.count}</p>
-                    <p className="mt-1 label text-gold">{tier.share}%</p>
-                    <div className="mt-3 h-1 w-full bg-rule/30">
-                      <div
-                        className="h-full bg-gradient-to-r from-gold/80 to-gold/30 transition-all duration-1000"
-                        style={{ width: `${tier.share}%` }}
-                      />
+              <div className="border border-rule/50 bg-void-deep/50 p-6">
+                <h3 className="label text-gold/70 mb-4">Data Sources (All Free)</h3>
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                  <div className="flex items-center gap-3">
+                    <div className="h-2 w-2 rounded-full bg-teal" />
+                    <div>
+                      <p className="text-sm text-ivory/80">CoinGecko API</p>
+                      <p className="label text-ivory/40">Crypto prices, market data • 50 req/min free</p>
                     </div>
                   </div>
-                </Reveal>
-              ))}
-            </div>
-          </section>
-
-          <SectionDivider variant="glyph" />
-
-          {/* Civilization Capital Flows */}
-          <section className="section-sm mx-auto max-w-[1440px] px-6 md:px-10 lg:px-16">
-            <Reveal>
-              <div className="mb-8 flex items-baseline gap-6">
-                <span className="label text-gold">Civilization Capital Flows</span>
-                <span className="h-px flex-1 bg-rule" />
-                <span className="label text-ivory/40">24h</span>
-              </div>
-            </Reveal>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {data.civFlows.map((civ, i) => {
-                const isPositive = civ.net > 0;
-                return (
-                  <Reveal key={civ.name} delay={i * 0.05}>
-                    <div className="border border-rule bg-void-deep p-6 transition-all duration-500 hover:border-gold/20">
-                      <div className="flex items-center justify-between">
-                        <h4 className="font-display text-lg text-ivory" style={{ fontFamily: 'var(--font-display), serif' }}>
-                          {civ.name}
-                        </h4>
-                        <span className={`label ${isPositive ? 'text-teal' : 'text-ember'}`}>
-                          {isPositive ? '↑' : '↓'} {formatNumber(Math.abs(civ.net))}
-                        </span>
-                      </div>
-                      <div className="mt-4 grid grid-cols-2 gap-4">
-                        <div>
-                          <span className="label text-ivory/40">Inflow</span>
-                          <p className="mt-1 font-mono text-sm text-teal">+{formatNumber(civ.inflow)}</p>
-                        </div>
-                        <div>
-                          <span className="label text-ivory/40">Outflow</span>
-                          <p className="mt-1 font-mono text-sm text-ember">-{formatNumber(civ.outflow)}</p>
-                        </div>
-                      </div>
-                      <div className="mt-4 h-1 w-full bg-rule/30">
-                        <div
-                          className="h-full transition-all duration-1000"
-                          style={{
-                            width: `${Math.min(100, (civ.inflow / (civ.inflow + civ.outflow)) * 100)}%`,
-                            backgroundColor: isPositive ? '#00B4A8' : '#A33A4A',
-                          }}
-                        />
-                      </div>
+                  <div className="flex items-center gap-3">
+                    <div className="h-2 w-2 rounded-full bg-teal" />
+                    <div>
+                      <p className="text-sm text-ivory/80">Solana Public RPC</p>
+                      <p className="label text-ivory/40">Network stats, slot, supply • No key required</p>
                     </div>
-                  </Reveal>
-                );
-              })}
-            </div>
-          </section>
-
-          {/* Disclaimer */}
-          <section className="section-sm mx-auto max-w-[1440px] px-6 md:px-10 lg:px-16">
-            <Reveal>
-              <div className="border border-rule/50 bg-void-deep/50 p-6 text-center">
-                <p className="text-xs text-ivory/30" style={{ lineHeight: '1.7' }}>
-                  Data is simulated for demonstration purposes. In production, metrics are sourced from on-chain data via Helius DAS API, Jupiter, and Birdeye.
-                  This is not financial advice. $MYTH is a participation token, not an investment instrument.
-                </p>
-                <p className="mt-2 label text-ivory/20">
-                  Last updated: {new Date(data.lastUpdated).toLocaleString()}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="h-2 w-2 rounded-full bg-amber" />
+                    <div>
+                      <p className="text-sm text-ivory/80">Helius API (optional)</p>
+                      <p className="label text-ivory/40">Token metadata, holders • 100k req/day free tier</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="h-2 w-2 rounded-full bg-amber" />
+                    <div>
+                      <p className="text-sm text-ivory/80">Birdeye API (optional)</p>
+                      <p className="label text-ivory/40">Solana token data • 100 req/min free tier</p>
+                    </div>
+                  </div>
+                </div>
+                <p className="mt-4 text-xs text-ivory/30" style={{ lineHeight: '1.7' }}>
+                  All data is fetched server-side with 30-second caching to respect rate limits. Auto-refreshes every 60 seconds.
+                  Set HELIUS_API_KEY environment variable for enhanced token data.
                 </p>
               </div>
-            </Reveal>
-          </section>
-
-          {/* CTA */}
-          <section className="section-lg text-center">
-            <Reveal>
-              <MythMark size={60} stroke="#D8B36A" className="mx-auto mb-8" />
-              <h2 className="headline-section text-ivory">Shape the Culture</h2>
-              <p
-                className="mx-auto mt-6 max-w-xl font-display text-base italic text-ivory/70 md:text-lg"
-                style={{ fontFamily: 'var(--font-display), serif', lineHeight: '1.6' }}
-              >
-                Every canon entry you author, every ritual you attend, every vote you cast — the index moves.
-              </p>
-              <a
-                href="/governance"
-                className="label mt-10 inline-flex items-center gap-3 border border-gold px-10 py-5 text-gold transition-all duration-700 hover:bg-gold hover:text-void"
-              >
-                Enter Governance<span aria-hidden="true">→</span>
-              </a>
             </Reveal>
           </section>
         </>
       )}
+
+      {/* CTA */}
+      <section className="section-lg text-center">
+        <Reveal>
+          <MythMark size={60} stroke="#D8B36A" className="mx-auto mb-8" />
+          <h2 className="headline-section text-ivory">Shape the Culture</h2>
+          <p className="mx-auto mt-6 max-w-xl font-display text-base italic text-ivory/70 md:text-lg" style={{ fontFamily: 'var(--font-display), serif', lineHeight: '1.6' }}>
+            Every canon entry you author, every vote you cast, every agent you hire — the index moves.
+          </p>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+            <a href="/forge" className="label inline-flex items-center gap-3 border border-gold px-8 py-4 text-gold transition-all duration-700 hover:bg-gold hover:text-void">
+              Enter the Forge<span aria-hidden="true">→</span>
+            </a>
+            <a href="/marketplace" className="label inline-flex items-center gap-3 border border-rule px-8 py-4 text-ivory/60 transition-all duration-700 hover:border-gold/40 hover:text-gold">
+              Hire an Agent<span aria-hidden="true">→</span>
+            </a>
+          </div>
+        </Reveal>
+      </section>
 
       {/* Footer */}
       <footer className="border-t border-rule bg-void-deep">

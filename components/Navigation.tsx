@@ -31,6 +31,8 @@ export function Navigation() {
             <Link href="/oracle" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Oracle</Link>
             <Link href="/atlas" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Atlas</Link>
             <Link href="/analytics" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Analytics</Link>
+            <Link href="/marketplace" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Market</Link>
+            <Link href="/forge" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Forge</Link>
           </div>
           <div className="flex items-center gap-4">
             <ClientOnly fallback={<button className="label border border-gold/40 px-5 py-2.5 text-gold/50">Loading...</button>}>
@@ -90,6 +92,8 @@ export function Navigation() {
               { href: '/rituals', label: 'Rituals' },
               { href: '/atlas', label: 'Atlas' },
               { href: '/analytics', label: 'Analytics' },
+              { href: '/marketplace', label: 'Agent Market' },
+              { href: '/forge', label: 'Canon Builder' },
               { href: '/score', label: 'Culture Score' },
               { href: '/inheritance', label: 'Inheritance' },
               { href: '/token', label: '$MYTH Token' },
