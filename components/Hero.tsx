@@ -6,6 +6,8 @@ import { HERO } from '@/lib/content';
 import { MythMark } from '@/components/glyphs';
 import { ClientOnly } from '@/components/ClientOnly';
 import { WalletConnectButton } from '@/components/WalletConnectButton';
+import { useAccount, useConnect } from 'wagmi';
+import { injected } from 'wagmi/connectors';
 import dynamic from 'next/dynamic';
 
 const HeroScene = dynamic(async () => (await import('./HeroScene')).HeroScene, {
@@ -28,6 +30,16 @@ function useSafeReducedMotion() {
 
 export function Hero() {
   const reduce = useSafeReducedMotion();
+  const { isConnected } = useAccount();
+  const { connect } = useConnect();
+
+  const handleEnter = () => {
+    if (isConnected) {
+      document.getElementById('chapter-1')?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      connect({ connector: injected() });
+    }
+  };
 
   return (
     <section id="top" className="relative flex h-[100vh] min-h-[720px] items-center justify-center overflow-hidden">
@@ -89,8 +101,8 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, delay: 1.5 }}
         >
-          <ClientOnly fallback={<button className="label inline-flex items-center gap-3 border border-gold/40 px-10 py-5 text-gold/50">Loading...</button>}>
-            <WalletConnectButton />
+          <ClientOnly fallback={<button className="label inline-flex items-center gap-3 border border-gold/40 px-10 py-5 text-gold/50">Loading wallet...</button>}>
+            <WalletConnectButton onClick={handleEnter} connected={isConnected} />
           </ClientOnly>
         </motion.div>
       </div>

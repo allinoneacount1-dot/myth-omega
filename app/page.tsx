@@ -1,22 +1,50 @@
+'use client';
+
 import { CHAPTERS, AGENTS, TOKEN, ECOSYSTEM, FINAL, HERO } from '@/lib/content';
-import { GLYPH_MAP, MythMark } from '@/components/glyphs';
+import { MythMark } from '@/components/glyphs';
 import { AgentGlyph } from '@/components/agent-glyphs';
 import { Reveal } from '@/components/Reveal';
 import { SectionDivider } from '@/components/SectionDivider';
 import { Hero } from '@/components/Hero';
 import { Navigation } from '@/components/Navigation';
+import { ClientOnly } from '@/components/ClientOnly';
+import { WalletConnectButton } from '@/components/WalletConnectButton';
+import { motion } from 'framer-motion';
+import Link from 'next/link';
 
-export default function Home() {
+function HomeContent() {
   return (
     <main className="bg-void text-ivory">
       <Navigation />
       <Hero />
-
       <SectionDivider variant="particles" />
 
       {/* CHAPTERS */}
       {CHAPTERS.map((chapter) => {
-        const Glyph = GLYPH_MAP[chapter.glyph];
+        const Glyph = (props: { size?: number; stroke?: string; strokeWidth?: number }) => {
+          const Comp = {
+            forgetting: (p: React.SVGProps<SVGSVGElement>) => (
+              <svg {...p} viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="26" stroke="currentColor" strokeWidth="1" /><path d="M32 6 A26 26 0 0 1 58 32" stroke="currentColor" strokeWidth="1" opacity="0.25" /><path d="M58 32 A26 26 0 0 1 32 58" stroke="currentColor" strokeWidth="1" opacity="0.5" /><circle cx="32" cy="32" r="3" fill="currentColor" /></svg>
+            ),
+            birth: (p: React.SVGProps<SVGSVGElement>) => (
+              <svg {...p} viewBox="0 0 64 64" fill="none"><path d="M32 8 L56 52 L8 52 Z" stroke="currentColor" strokeWidth="1" /><circle cx="32" cy="36" r="10" stroke="currentColor" strokeWidth="1" /><circle cx="32" cy="36" r="2" fill="currentColor" /></svg>
+            ),
+            culture: (p: React.SVGProps<SVGSVGElement>) => (
+              <svg {...p} viewBox="0 0 64 64" fill="none"><path d="M8 48 Q32 32 56 48" stroke="currentColor" strokeWidth="1" /><path d="M8 38 Q32 22 56 38" stroke="currentColor" strokeWidth="1" opacity="0.65" /><path d="M8 28 Q32 12 56 28" stroke="currentColor" strokeWidth="1" opacity="0.35" /><line x1="8" y1="54" x2="56" y2="54" stroke="currentColor" strokeWidth="1" /></svg>
+            ),
+            civilization: (p: React.SVGProps<SVGSVGElement>) => (
+              <svg {...p} viewBox="0 0 64 64" fill="none"><rect x="6" y="6" width="52" height="52" stroke="currentColor" strokeWidth="1" /><rect x="14" y="14" width="36" height="36" stroke="currentColor" strokeWidth="1" opacity="0.7" /><rect x="22" y="22" width="20" height="20" stroke="currentColor" strokeWidth="1" opacity="0.4" /><circle cx="32" cy="32" r="3" fill="currentColor" /></svg>
+            ),
+            engine: (p: React.SVGProps<SVGSVGElement>) => (
+              <svg {...p} viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="26" stroke="currentColor" strokeWidth="1" /><circle cx="32" cy="32" r="18" stroke="currentColor" strokeWidth="1" opacity="0.7" /><circle cx="32" cy="32" r="10" stroke="currentColor" strokeWidth="1" opacity="0.4" /><line x1="6" y1="32" x2="58" y2="32" stroke="currentColor" strokeWidth="1" opacity="0.5" /><line x1="32" y1="6" x2="32" y2="58" stroke="currentColor" strokeWidth="1" opacity="0.5" /><circle cx="32" cy="32" r="2" fill="currentColor" /></svg>
+            ),
+            future: (p: React.SVGProps<SVGSVGElement>) => (
+              <svg {...p} viewBox="0 0 64 64" fill="none"><line x1="6" y1="54" x2="58" y2="54" stroke="currentColor" strokeWidth="1" /><line x1="32" y1="54" x2="32" y2="8" stroke="currentColor" strokeWidth="1" /><circle cx="32" cy="20" r="6" stroke="currentColor" strokeWidth="1" opacity="0.5" /><circle cx="32" cy="14" r="3" stroke="currentColor" strokeWidth="1" /><path d="M26 36 L32 30 L38 36" stroke="currentColor" strokeWidth="1" opacity="0.6" /></svg>
+            ),
+          }[chapter.glyph];
+          return <Comp {...props} />;
+        };
+
         return (
           <section key={chapter.index} id={`chapter-${chapter.index}`} className="section-md mx-auto max-w-[1440px] px-6 md:px-10 lg:px-16">
             <div className="grid grid-cols-1 gap-12 md:grid-cols-12">
@@ -24,7 +52,7 @@ export default function Home() {
                 <Reveal>
                   <div className="flex flex-col gap-6">
                     <span className="label text-gold">Chapter {chapter.roman}</span>
-                    <div className="text-gold/70"><Glyph size={64} stroke="currentColor" strokeWidth={1} /></div>
+                    <div className="text-gold/70"><Glyph size={64} strokeWidth={1} /></div>
                   </div>
                 </Reveal>
               </div>
@@ -73,23 +101,20 @@ export default function Home() {
             </p>
           </Reveal>
           <div className="mt-24 grid grid-cols-1 gap-px bg-rule md:grid-cols-2 lg:grid-cols-4">
-            {AGENTS.map((agent, i) => {
-              const Glyph = AgentGlyph;
-              return (
-                <Reveal key={agent.name} delay={0.05 * i}>
-                  <article className="group flex h-full flex-col bg-void-deep p-8 transition-colors duration-700 hover:bg-sapphire/40">
-                    <div className="mb-8 flex items-baseline justify-between">
-                      <span className="label text-gold/60">{String(i + 1).padStart(2, '0')}</span>
-                      <span className="label text-ivory/30">{agent.role}</span>
-                    </div>
-                    <div className="mb-10 text-gold transition-transform duration-700 group-hover:scale-110"><Glyph name={agent.name} size={72} stroke="currentColor" /></div>
-                    <h4 className="font-display text-3xl text-ivory" style={{ fontFamily: 'var(--font-display), serif' }}>{agent.name}</h4>
-                    <p className="mt-4 flex-1 text-sm leading-relaxed text-ivory/70" style={{ lineHeight: '1.65' }}>{agent.desc}</p>
-                    <div className="mt-8 h-px w-12 bg-gold/30 transition-all duration-700 group-hover:w-full" />
-                  </article>
-                </Reveal>
-              );
-            })}
+            {AGENTS.map((agent, i) => (
+              <Reveal key={agent.name} delay={0.05 * i}>
+                <article className="group flex h-full flex-col bg-void-deep p-8 transition-colors duration-700 hover:bg-sapphire/40">
+                  <div className="mb-8 flex items-baseline justify-between">
+                    <span className="label text-gold/60">{String(i + 1).padStart(2, '0')}</span>
+                    <span className="label text-ivory/30">{agent.role}</span>
+                  </div>
+                  <div className="mb-10 text-gold transition-transform duration-700 group-hover:scale-110"><AgentGlyph name={agent.name} size={72} stroke="currentColor" /></div>
+                  <h4 className="font-display text-3xl text-ivory" style={{ fontFamily: 'var(--font-display), serif' }}>{agent.name}</h4>
+                  <p className="mt-4 flex-1 text-sm leading-relaxed text-ivory/70" style={{ lineHeight: '1.65' }}>{agent.desc}</p>
+                  <div className="mt-8 h-px w-12 bg-gold/30 transition-all duration-700 group-hover:w-full" />
+                </article>
+              </Reveal>
+            ))}
           </div>
         </div>
       </section>
@@ -173,9 +198,9 @@ export default function Home() {
             </p>
           </Reveal>
           <Reveal delay={0.5}>
-            <a href="#" className="label mt-16 inline-flex items-center gap-3 border border-gold px-10 py-5 text-gold transition-all duration-700 hover:bg-gold hover:text-void">
-              {FINAL.cta}<span aria-hidden="true">→</span>
-            </a>
+            <ClientOnly fallback={<a href="#" className="label mt-16 inline-flex items-center gap-3 border border-gold px-10 py-5 text-gold transition-all duration-700 hover:bg-gold hover:text-void">{FINAL.cta}<span aria-hidden="true">→</span></a>}>
+              <WalletConnectButton onClick={() => {}} />
+            </ClientOnly>
           </Reveal>
         </div>
       </section>
@@ -230,5 +255,13 @@ export default function Home() {
         </div>
       </footer>
     </main>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <ClientOnly>
+      <HomeContent />
+    </ClientOnly>
   );
 }
