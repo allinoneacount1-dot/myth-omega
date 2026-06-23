@@ -5,7 +5,7 @@ import { AGENT_GLYPHS } from '@/components/agent-glyphs';
 export default function Home() {
   return (
     <main className="bg-void text-ivory">
-      {/* ── NAV ── */}
+      {/* NAV */}
       <nav className="fixed left-0 right-0 top-0 z-50 border-b border-transparent bg-void/70 backdrop-blur-md">
         <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-5 md:px-10 lg:px-16">
           <a href="#top" className="flex items-center gap-3">
@@ -21,7 +21,7 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* ── HERO ── */}
+      {/* HERO */}
       <section id="top" className="relative flex h-[100vh] min-h-[720px] items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(216,179,106,0.08)_0%,transparent_60%)]" />
@@ -42,7 +42,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── CHAPTERS ── */}
+      {/* CHAPTERS */}
       {CHAPTERS.map((chapter) => {
         const Glyph = GLYPH_MAP[chapter.glyph];
         return (
@@ -74,7 +74,7 @@ export default function Home() {
         );
       })}
 
-      {/* ── AGENTS ── */}
+      {/* AGENTS */}
       <section id="agents" className="section-md bg-void-deep">
         <div className="mx-auto max-w-[1440px] px-6 md:px-10 lg:px-16">
           <div className="mb-20 flex items-baseline gap-6">
@@ -106,7 +106,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── TOKEN ── */}
+      {/* TOKEN */}
       <section id="token" className="section-md">
         <div className="mx-auto max-w-[1440px] px-6 md:px-10 lg:px-16">
           <div className="mb-20 flex items-baseline gap-6">
@@ -137,7 +137,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── ECOSYSTEM ── */}
+      {/* ECOSYSTEM */}
       <section className="section-md bg-void-deep">
         <div className="mx-auto max-w-[1440px] px-6 md:px-10 lg:px-16">
           <div className="mb-20 flex items-baseline gap-6">
@@ -158,7 +158,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── FINAL CTA ── */}
+      {/* FINAL CTA */}
       <section id="enter" className="section-lg">
         <div className="mx-auto max-w-[1440px] px-6 text-center md:px-10 lg:px-16">
           <span className="label text-gold">Final Word</span>
@@ -172,7 +172,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── FOOTER ── */}
+      {/* FOOTER */}
       <footer className="border-t border-rule bg-void-deep">
         <div className="mx-auto max-w-[1440px] px-6 py-16 md:px-10 lg:px-16">
           <div className="grid grid-cols-1 gap-12 md:grid-cols-12">
@@ -216,7 +216,7 @@ export default function Home() {
             </div>
           </div>
           <div className="mt-16 flex flex-col items-start justify-between gap-4 border-t border-rule pt-8 md:flex-row md:items-center">
-            <span className="label text-ivory/30">Version 1.0 / Genesis Draft</span>
+            <span className="label text-ivory/30">"Version 1.0 / Genesis Draft</span>
             <span className="label text-ivory/30">A civilization operating system</span>
           </div>
         </div>
