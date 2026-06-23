@@ -19,7 +19,7 @@ const config = createConfig({
   connectors: [
     injected(),
     walletConnect({ projectId, metadata, showQrModal: true }),
-    coinbaseWallet({ appName: 'MYTH OMEGA', appIcon: '/favicon.svg' }),
+    coinbaseWallet({ appName: 'MYTH OMEGA' }),
   ],
   ssr: true,
   transports: {

@@ -1,31 +1,15 @@
 import { CHAPTERS, AGENTS, TOKEN, ECOSYSTEM, FINAL, HERO } from '@/lib/content';
 import { GLYPH_MAP, MythMark } from '@/components/glyphs';
-import { WalletConnect } from '@/components/WalletConnect';
 import { AGENT_GLYPHS } from '@/components/agent-glyphs';
 import { Reveal } from '@/components/Reveal';
 import { StaggerContainer, StaggerItem } from '@/components/Stagger';
 import { Hero } from '@/components/Hero';
+import { Navigation } from '@/components/Navigation';
 
 export default function Home() {
   return (
     <main className="bg-void text-ivory">
-      {/* NAV */}
-      <nav className="fixed left-0 right-0 top-0 z-50 border-b border-transparent bg-void/70 backdrop-blur-md">
-        <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-5 md:px-10 lg:px-16">
-          <a href="#top" className="flex items-center gap-3">
-            <MythMark size={32} stroke="#F7F4EE" />
-            <span className="label text-ivory">MYTH</span>
-          </a>
-          <div className="hidden items-center gap-10 md:flex">
-            {CHAPTERS.slice(0, 3).map((c) => (
-              <a key={c.index} href={`#chapter-${c.index}`} className="label text-ivory/55 transition-colors duration-500 hover:text-gold">{c.title}</a>
-            ))}
-            <a href="#agents" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Agents</a>
-            <a href="#token" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">$MYTH</a>
-          </div>
-          <WalletConnect />
-        </div>
-      </nav>
+      <Navigation />
 
       <Hero />
 

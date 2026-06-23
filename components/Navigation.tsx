@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { MythMark } from '@/components/glyphs';
-import { WalletConnect } from '@/components/WalletConnect';
+import { ClientOnly } from '@/components/ClientOnly';
+import { WalletConnectButton } from '@/components/WalletConnectButton';
 import { CHAPTERS } from '@/lib/content';
 
 export function Navigation() {
@@ -21,7 +22,9 @@ export function Navigation() {
           <Link href="/token" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">$MYTH</Link>
           <Link href="/whitepaper" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Whitepaper</Link>
         </div>
-        <WalletConnect />
+        <ClientOnly fallback={<button className="label border border-gold/40 px-5 py-2.5 text-gold/50">Loading...</button>}>
+          <WalletConnectButton />
+        </ClientOnly>
       </div>
     </nav>
   );
