@@ -126,3 +126,31 @@ html.lenis body {
     scroll-behavior: auto !important;
   }
 }
+/* Hero entrance animations — pure CSS, no framer-motion */
+.hero-entrance {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hero-entrance-active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Scroll indicator — gentle bounce */
+@keyframes heroBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+
+.hero-scroll-indicator {
+  opacity: 0;
+  transition: opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1) 1.6s;
+}
+
+.hero-scroll-active {
+  opacity: 1;
+  animation: heroBounce 2.4s ease-in-out infinite 2s;
+}

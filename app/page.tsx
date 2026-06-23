@@ -1,5 +1,6 @@
 import { CHAPTERS, AGENTS, TOKEN, ECOSYSTEM, FINAL, HERO } from '@/lib/content';
 import { GLYPH_MAP, MythMark } from '@/components/glyphs';
+import { WalletConnect } from '@/components/WalletConnect';
 import { AGENT_GLYPHS } from '@/components/agent-glyphs';
 import { Reveal } from '@/components/Reveal';
 import { StaggerContainer, StaggerItem } from '@/components/Stagger';
@@ -22,7 +23,7 @@ export default function Home() {
             <a href="#agents" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Agents</a>
             <a href="#token" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">$MYTH</a>
           </div>
-          <a href="#enter" className="label border border-gold/40 px-5 py-2.5 text-gold transition-all duration-500 hover:border-gold hover:bg-gold/10">Enter</a>
+          <WalletConnect />
         </div>
       </nav>
 

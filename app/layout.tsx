@@ -5,6 +5,7 @@ import { PageReveal } from '@/components/PageReveal';
 import { ScrollProgress } from '@/components/ScrollProgress';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ErrorCapture } from '@/components/ErrorCapture';
+import { WagmiWalletProvider } from '@/components/WalletProvider';
 
 export const metadata: Metadata = {
   title: 'MYTH — The Culture Engine',
@@ -29,15 +30,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </head>
       <body className="bg-void text-ivory antialiased">
-        <ErrorBoundary>
-          <PageReveal>
-            <SmoothScroll>
-              <ScrollProgress />
-              {children}
-              <ErrorCapture />
-            </SmoothScroll>
-          </PageReveal>
-        </ErrorBoundary>
+        <WagmiWalletProvider>
+          <ErrorBoundary>
+            <PageReveal>
+              <SmoothScroll>
+                <ScrollProgress />
+                {children}
+                <ErrorCapture />
+              </SmoothScroll>
+            </PageReveal>
+          </ErrorBoundary>
+        </WagmiWalletProvider>
       </body>
     </html>
   );

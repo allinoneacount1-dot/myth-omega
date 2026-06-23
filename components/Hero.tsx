@@ -4,7 +4,8 @@ import { Suspense, useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { HERO } from '@/lib/content';
-import { MythMark } from '@/components/glyphs';
+import { useAccount, useConnect } from 'wagmi';
+import { injected } from 'wagmi/connectors';
 
 const HeroScene = dynamic(async () => (await import('./HeroScene')).HeroScene, {
   ssr: false,
@@ -26,6 +27,16 @@ function useSafeReducedMotion() {
 
 export function Hero() {
   const reduce = useSafeReducedMotion();
+  const { isConnected } = useAccount();
+  const { connect } = useConnect();
+
+  const handleEnter = () => {
+    if (isConnected) {
+      document.getElementById('chapter-1')?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      connect({ connector: injected() });
+    }
+  };
 
   return (
     <section id="top" className="relative flex h-[100vh] min-h-[720px] items-center justify-center overflow-hidden">
@@ -80,6 +91,20 @@ export function Hero() {
           transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
         >
           <div className="h-12 w-px bg-gradient-to-b from-gold to-transparent" />
+        </motion.div>
+        <motion.div
+          className="mt-16"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.2, delay: 1.5 }}
+        >
+          <button
+            onClick={handleEnter}
+            className="label inline-flex items-center gap-3 border border-gold px-10 py-5 text-gold transition-all duration-700 hover:bg-gold hover:text-void"
+          >
+            {isConnected ? 'Explore MYTH' : 'Connect Wallet'}
+            <span aria-hidden="true">→</span>
+          </button>
         </motion.div>
       </div>
     </section>
