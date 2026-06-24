@@ -1,286 +1,336 @@
-import { CHAPTERS, AGENTS, TOKEN, ECOSYSTEM, FINAL, HERO } from '@/lib/content';
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
+import { DashboardLayout } from '@/components/DashboardLayout';
 import { MythMark } from '@/components/glyphs';
 import { AgentGlyph } from '@/components/agent-glyphs';
-import { Reveal } from '@/components/Reveal';
-import { SectionDivider } from '@/components/SectionDivider';
-import { Hero } from '@/components/Hero';
-import { ClientOnly } from '@/components/ClientOnly';
-import { WalletConnectButton } from '@/components/WalletConnectButton';
-import Link from 'next/link';
+import { CIVILIZATION_PROFILES } from '@/lib/civilizations';
+import { AGENT_MARKETPLACE } from '@/lib/marketplace';
 
-function SimpleNav() {
+interface DashboardStats {
+  totalCivilizations: number;
+  totalAgents: number;
+  totalProposals: number;
+  activeQuests: number;
+  cultureHealth: number;
+}
+
+interface LiveData {
+  solPrice: number;
+  solChange24h: number;
+  btcPrice: number;
+  btcChange24h: number;
+  networkTps: number;
+  lastUpdated: string;
+}
+
+function formatPrice(p: number): string {
+  if (p >= 1000) return `$${p.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  if (p >= 1) return `$${p.toFixed(2)}`;
+  return `$${p.toFixed(4)}`;
+}
+
+function StatCard({ label, value, change, icon, color = '#D8B36A' }: {
+  label: string;
+  value: string | number;
+  change?: number;
+  icon?: string;
+  color?: string;
+}) {
   return (
-    <nav className="fixed left-0 right-0 top-0 z-50 border-b border-transparent bg-void/70 backdrop-blur-md">
-      <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-5 md:px-10 lg:px-16">
-        <Link href="/" className="flex items-center gap-3">
-          <MythMark size={32} stroke="#F7F4EE" />
-          <span className="label text-ivory">MYTH</span>
-        </Link>
-        <div className="hidden items-center gap-8 md:flex lg:gap-10">
-          <a href="#chapter-1" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Genesis</a>
-          <span className="text-ivory/20">/</span>
-          <a href="#chapter-2" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Birth</a>
-          <span className="text-ivory/20">/</span>
-          <a href="#chapter-3" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Rise</a>
-          <span className="text-ivory/20">·</span>
-          <Link href="/agents" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Agents</Link>
-          <Link href="/civilization" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Worlds</Link>
-          <Link href="/governance" className="label text-ivory/55 transition-colors duration-500 hover:text-gold">Governance</Link>
-        </div>
-        <div className="flex items-center gap-4">
-          <ClientOnly fallback={<button className="label border border-gold/40 px-5 py-2.5 text-gold/50">Loading...</button>}>
-            <WalletConnectButton />
-          </ClientOnly>
-        </div>
+    <div className="border border-rule bg-void-deep p-5 transition-all duration-500 hover:border-gold/20">
+      <div className="flex items-start justify-between">
+        <span className="label text-ivory/40">{label}</span>
+        {icon && <span className="text-lg">{icon}</span>}
       </div>
-    </nav>
+      <p className="mt-2 font-mono text-2xl text-ivory">{value}</p>
+      {change !== undefined && (
+        <p className={`mt-1 label ${change >= 0 ? 'text-teal' : 'text-ember'}`}>
+          {change >= 0 ? '↑' : '↓'} {Math.abs(change).toFixed(2)}%
+        </p>
+      )}
+    </div>
   );
 }
 
-export default function HomePage() {
+function MiniChart({ data, color = '#D8B36A' }: { data: number[]; color?: string }) {
+  if (data.length < 2) return null;
+  const min = Math.min(...data);
+  const max = Math.max(...data);
+  const range = max - min || 1;
+  const width = 100;
+  const height = 40;
+  const points = data.map((p, i) => {
+    const x = (i / (data.length - 1)) * width;
+    const y = height - ((p - min) / range) * height;
+    return `${x},${y}`;
+  });
+
   return (
-    <main className="bg-void text-ivory">
-      <SimpleNav />
-      <Hero />
-      <SectionDivider variant="particles" />
+    <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-10" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id={`grad-${color.replace('#', '')}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={color} stopOpacity="0.3" />
+          <stop offset="100%" stopColor={color} stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <polygon points={`0,${height} ${points.join(' ')} ${width},${height}`} fill={`url(#grad-${color.replace('#', '')})`} />
+      <polyline points={points.join(' ')} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
 
-      {/* CHAPTERS */}
-      {CHAPTERS.map((chapter) => {
-        const Glyph = (props: { size?: number; stroke?: string; strokeWidth?: number }) => {
-          const Comp = {
-            forgetting: (p: React.SVGProps<SVGSVGElement>) => (
-              <svg {...p} viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="26" stroke="currentColor" strokeWidth="1" /><path d="M32 6 A26 26 0 0 1 58 32" stroke="currentColor" strokeWidth="1" opacity="0.25" /><path d="M58 32 A26 26 0 0 1 32 58" stroke="currentColor" strokeWidth="1" opacity="0.5" /><circle cx="32" cy="32" r="3" fill="currentColor" /></svg>
-            ),
-            birth: (p: React.SVGProps<SVGSVGElement>) => (
-              <svg {...p} viewBox="0 0 64 64" fill="none"><path d="M32 8 L56 52 L8 52 Z" stroke="currentColor" strokeWidth="1" /><circle cx="32" cy="36" r="10" stroke="currentColor" strokeWidth="1" /><circle cx="32" cy="36" r="2" fill="currentColor" /></svg>
-            ),
-            culture: (p: React.SVGProps<SVGSVGElement>) => (
-              <svg {...p} viewBox="0 0 64 64" fill="none"><path d="M8 48 Q32 32 56 48" stroke="currentColor" strokeWidth="1" /><path d="M8 38 Q32 22 56 38" stroke="currentColor" strokeWidth="1" opacity="0.65" /><path d="M8 28 Q32 12 56 28" stroke="currentColor" strokeWidth="1" opacity="0.35" /><line x1="8" y1="54" x2="56" y2="54" stroke="currentColor" strokeWidth="1" /></svg>
-            ),
-            civilization: (p: React.SVGProps<SVGSVGElement>) => (
-              <svg {...p} viewBox="0 0 64 64" fill="none"><rect x="6" y="6" width="52" height="52" stroke="currentColor" strokeWidth="1" /><rect x="14" y="14" width="36" height="36" stroke="currentColor" strokeWidth="1" opacity="0.7" /><rect x="22" y="22" width="20" height="20" stroke="currentColor" strokeWidth="1" opacity="0.4" /><circle cx="32" cy="32" r="3" fill="currentColor" /></svg>
-            ),
-            engine: (p: React.SVGProps<SVGSVGElement>) => (
-              <svg {...p} viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="26" stroke="currentColor" strokeWidth="1" /><circle cx="32" cy="32" r="18" stroke="currentColor" strokeWidth="1" opacity="0.7" /><circle cx="32" cy="32" r="10" stroke="currentColor" strokeWidth="1" opacity="0.4" /><line x1="6" y1="32" x2="58" y2="32" stroke="currentColor" strokeWidth="1" opacity="0.5" /><line x1="32" y1="6" x2="32" y2="58" stroke="currentColor" strokeWidth="1" opacity="0.5" /><circle cx="32" cy="32" r="2" fill="currentColor" /></svg>
-            ),
-            future: (p: React.SVGProps<SVGSVGElement>) => (
-              <svg {...p} viewBox="0 0 64 64" fill="none"><line x1="6" y1="54" x2="58" y2="54" stroke="currentColor" strokeWidth="1" /><line x1="32" y1="54" x2="32" y2="8" stroke="currentColor" strokeWidth="1" /><circle cx="32" cy="20" r="6" stroke="currentColor" strokeWidth="1" opacity="0.5" /><circle cx="32" cy="14" r="3" stroke="currentColor" strokeWidth="1" /><path d="M26 36 L32 30 L38 36" stroke="currentColor" strokeWidth="1" opacity="0.6" /></svg>
-            ),
-          }[chapter.glyph];
-          return <Comp {...props} />;
-        };
+export default function DashboardPage() {
+  const [liveData, setLiveData] = useState<LiveData | null>(null);
+  const [loading, setLoading] = useState(true);
 
-        return (
-          <section key={chapter.index} id={`chapter-${chapter.index}`} className="section-md mx-auto max-w-[1440px] px-6 md:px-10 lg:px-16">
-            <div className="grid grid-cols-1 gap-12 md:grid-cols-12">
-              <div className="md:col-span-3">
-                <Reveal>
-                  <div className="flex flex-col gap-6">
-                    <span className="label text-gold">Chapter {chapter.roman}</span>
-                    <div className="text-gold/70"><Glyph size={64} strokeWidth={1} /></div>
-                  </div>
-                </Reveal>
-              </div>
-              <div className="md:col-span-9">
-                <Reveal delay={0.1}><h2 className="headline-section text-ivory">{chapter.title}</h2></Reveal>
-                <Reveal delay={0.2}>
-                  <p className="mt-6 max-w-2xl font-display text-xl italic text-gold md:text-2xl" style={{ fontFamily: 'var(--font-display), serif' }}>{chapter.sub}</p>
-                </Reveal>
-                <div className="mt-16 space-y-8">
-                  {chapter.body.map((para, i) => (
-                    <Reveal key={i} delay={0.3 + i * 0.08}>
-                      <p className="max-w-2xl text-lg leading-relaxed text-ivory/85 md:text-xl" style={{ lineHeight: '1.75' }}>{para}</p>
-                    </Reveal>
-                  ))}
-                </div>
-                {chapter.manifest && (
-                  <Reveal delay={0.6}>
-                    <div className="mt-20 max-w-2xl">
-                      <div className="h-px w-16 bg-gold/40" />
-                      <p className="mt-8 font-display text-xl italic text-gold md:text-2xl" style={{ fontFamily: 'var(--font-display), serif' }}>{chapter.manifest}</p>
-                    </div>
-                  </Reveal>
-                )}
-              </div>
-            </div>
-          </section>
-        );
-      })}
+  const stats: DashboardStats = {
+    totalCivilizations: 6,
+    totalAgents: 7,
+    totalProposals: Object.values(CIVILIZATION_PROFILES).reduce((sum, c) => sum + c.governance.proposals.length, 0),
+    activeQuests: Object.values(CIVILIZATION_PROFILES).reduce((sum, c) => sum + c.activeQuests.filter(q => q.status === 'active').length, 0),
+    cultureHealth: Math.round(Object.values(CIVILIZATION_PROFILES).reduce((sum, c) => sum + c.health, 0) / 6),
+  };
 
-      <SectionDivider variant="glyph" flip />
+  const fetchLiveData = useCallback(async () => {
+    try {
+      const res = await fetch('/api/analytics?type=all');
+      if (!res.ok) throw new Error('Failed');
+      const data = await res.json();
+      const sol = data.cryptoPrices?.find((c: any) => c.symbol === 'SOL');
+      const btc = data.cryptoPrices?.find((c: any) => c.symbol === 'BTC');
+      setLiveData({
+        solPrice: sol?.price || 0,
+        solChange24h: sol?.change24h || 0,
+        btcPrice: btc?.price || 0,
+        btcChange24h: btc?.change24h || 0,
+        networkTps: data.solanaNetwork?.avgTps || 0,
+        lastUpdated: data.timestamp,
+      });
+    } catch {
+      // Silent fail — dashboard still works without live data
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-      {/* AGENTS */}
-      <section id="agents" className="section-md bg-void-deep">
-        <div className="mx-auto max-w-[1440px] px-6 md:px-10 lg:px-16">
-          <Reveal>
-            <div className="mb-20 flex items-baseline gap-6">
-              <span className="label text-gold">The Seven</span>
-              <span className="h-px flex-1 bg-rule" />
-              <span className="label text-ivory/40">07 / 07</span>
-            </div>
-          </Reveal>
-          <Reveal delay={0.1}><h3 className="headline-section max-w-3xl text-ivory">Seven agents. One canon.</h3></Reveal>
-          <Reveal delay={0.2}>
-            <p className="mt-6 max-w-2xl font-display text-xl italic text-gold" style={{ fontFamily: 'var(--font-display), serif' }}>
-              Each civilization is tended by an intelligence with a single sacred duty.
-            </p>
-          </Reveal>
-          <div className="mt-24 grid grid-cols-1 gap-px bg-rule md:grid-cols-2 lg:grid-cols-4">
-            {AGENTS.map((agent, i) => (
-              <Reveal key={agent.name} delay={0.05 * i}>
-                <article className="group flex h-full flex-col bg-void-deep p-8 transition-colors duration-700 hover:bg-sapphire/40">
-                  <div className="mb-8 flex items-baseline justify-between">
-                    <span className="label text-gold/60">{String(i + 1).padStart(2, '0')}</span>
-                    <span className="label text-ivory/30">{agent.role}</span>
-                  </div>
-                  <div className="mb-10 text-gold transition-transform duration-700 group-hover:scale-110"><AgentGlyph name={agent.name} size={72} stroke="currentColor" /></div>
-                  <h4 className="font-display text-3xl text-ivory" style={{ fontFamily: 'var(--font-display), serif' }}>{agent.name}</h4>
-                  <p className="mt-4 flex-1 text-sm leading-relaxed text-ivory/70" style={{ lineHeight: '1.65' }}>{agent.desc}</p>
-                  <div className="mt-8 h-px w-12 bg-gold/30 transition-all duration-700 group-hover:w-full" />
-                </article>
-              </Reveal>
-            ))}
+  useEffect(() => {
+    fetchLiveData();
+    const interval = setInterval(fetchLiveData, 60_000);
+    return () => clearInterval(interval);
+  }, [fetchLiveData]);
+
+  return (
+    <DashboardLayout>
+      <div className="space-y-8">
+        {/* Welcome */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-display text-ivory" style={{ fontFamily: 'var(--font-display), serif' }}>
+              Command Center
+            </h1>
+            <p className="mt-1 text-sm text-ivory/50">MYTH Culture Engine — Real-time overview</p>
+          </div>
+          <div className="hidden items-center gap-2 md:flex">
+            <div className="h-2 w-2 rounded-full bg-teal animate-pulse" />
+            <span className="label text-ivory/30">
+              {liveData ? `Last sync: ${new Date(liveData.lastUpdated).toLocaleTimeString()}` : 'Connecting...'}
+            </span>
           </div>
         </div>
-      </section>
 
-      <SectionDivider variant="wave" />
-
-      {/* TOKEN */}
-      <section id="token" className="section-md">
-        <div className="mx-auto max-w-[1440px] px-6 md:px-10 lg:px-16">
-          <Reveal>
-            <div className="mb-20 flex items-baseline gap-6">
-              <span className="label text-gold">The Participation Layer</span>
-              <span className="h-px flex-1 bg-rule" />
-              <span className="label text-ivory/40">$MYTH</span>
+        {/* Live Market Ticker */}
+        {liveData && (
+          <div className="flex flex-wrap gap-4 border border-rule bg-void-deep p-4">
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-ivory/50">SOL</span>
+              <span className="font-mono text-lg text-ivory">{formatPrice(liveData.solPrice)}</span>
+              <span className={`label ${liveData.solChange24h >= 0 ? 'text-teal' : 'text-ember'}`}>
+                {liveData.solChange24h >= 0 ? '↑' : '↓'} {Math.abs(liveData.solChange24h).toFixed(2)}%
+              </span>
             </div>
-          </Reveal>
-          <Reveal delay={0.1}><h3 className="headline-section max-w-3xl text-ivory">{TOKEN.tagline}</h3></Reveal>
-          <div className="mt-16 grid grid-cols-1 gap-x-16 gap-y-12 lg:grid-cols-12">
-            <div className="lg:col-span-5">
-              {TOKEN.body.map((para, i) => (
-                <Reveal key={i} delay={0.15 * i}>
-                  <p className="mb-6 text-lg leading-relaxed text-ivory/85" style={{ lineHeight: '1.75' }}>{para}</p>
-                </Reveal>
+            <div className="text-ivory/20">|</div>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-ivory/50">BTC</span>
+              <span className="font-mono text-lg text-ivory">{formatPrice(liveData.btcPrice)}</span>
+              <span className={`label ${liveData.btcChange24h >= 0 ? 'text-teal' : 'text-ember'}`}>
+                {liveData.btcChange24h >= 0 ? '↑' : '↓'} {Math.abs(liveData.btcChange24h).toFixed(2)}%
+              </span>
+            </div>
+            <div className="text-ivory/20">|</div>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-ivory/50">Network TPS</span>
+              <span className="font-mono text-lg text-ivory">{liveData.networkTps.toLocaleString()}</span>
+            </div>
+          </div>
+        )}
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
+          <StatCard label="Civilizations" value={stats.totalCivilizations} icon="⬡" />
+          <StatCard label="Agents" value={stats.totalAgents} icon="◉" />
+          <StatCard label="Proposals" value={stats.totalProposals} icon="⚖" />
+          <StatCard label="Active Quests" value={stats.activeQuests} icon="⚔" />
+          <StatCard
+            label="Culture Health"
+            value={`${stats.cultureHealth}%`}
+            icon="♥"
+            color={stats.cultureHealth >= 80 ? '#00B4A8' : '#D8B36A'}
+          />
+        </div>
+
+        {/* Main Grid */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          {/* Civilizations */}
+          <div className="lg:col-span-2 border border-rule bg-void-deep p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="font-display text-xl text-ivory" style={{ fontFamily: 'var(--font-display), serif' }}>Civilizations</h2>
+              <Link href="/civilizations" className="label text-gold/60 hover:text-gold">View All →</Link>
+            </div>
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              {Object.values(CIVILIZATION_PROFILES).map((civ) => (
+                <Link
+                  key={civ.slug}
+                  href={`/civilization/${civ.slug}`}
+                  className="group flex items-center gap-4 border border-rule bg-void p-4 transition-all duration-500 hover:border-gold/20"
+                >
+                  <div className="flex h-10 w-10 items-center justify-center border" style={{ borderColor: `${civ.color}30`, backgroundColor: `${civ.color}10` }}>
+                    <div className="h-3 w-3 rounded-full" style={{ backgroundColor: civ.color }} />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-medium text-ivory/90">{civ.name}</h3>
+                      <span className="label text-ivory/30">{civ.genre}</span>
+                    </div>
+                    <div className="mt-2 flex items-center gap-3">
+                      <div className="flex-1 h-1.5 bg-rule/20 rounded-full overflow-hidden">
+                        <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${civ.health}%`, backgroundColor: civ.color }} />
+                      </div>
+                      <span className="label text-ivory/40">{civ.health}%</span>
+                    </div>
+                    <p className="mt-1 label text-ivory/30">{civ.members.toLocaleString()} members • {civ.canonEntries} entries</p>
+                  </div>
+                </Link>
               ))}
             </div>
-            <div className="lg:col-span-7">
-              <Reveal delay={0.3}><span className="label text-ivory/50">Six utilities</span></Reveal>
-              <div className="mt-8 grid grid-cols-1 gap-px bg-rule sm:grid-cols-2">
-                {TOKEN.uses.map((use, i) => (
-                  <Reveal key={use.title} delay={0.35 + i * 0.05}>
-                    <div className="group bg-void p-6 transition-colors duration-500 hover:bg-sapphire/30">
-                      <span className="label text-gold/70">{String(i + 1).padStart(2, '0')}</span>
-                      <h5 className="mt-3 font-display text-xl text-ivory" style={{ fontFamily: 'var(--font-display), serif' }}>{use.title}</h5>
-                      <p className="mt-2 text-sm text-ivory/65" style={{ lineHeight: '1.6' }}>{use.desc}</p>
+          </div>
+
+          {/* Agent Status */}
+          <div className="border border-rule bg-void-deep p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="font-display text-xl text-ivory" style={{ fontFamily: 'var(--font-display), serif' }}>Agent Status</h2>
+              <Link href="/agents" className="label text-gold/60 hover:text-gold">All →</Link>
+            </div>
+            <div className="space-y-3">
+              {AGENT_MARKETPLACE.map((agent) => (
+                <Link
+                  key={agent.name}
+                  href={`/agents/${agent.name.toLowerCase()}`}
+                  className="flex items-center gap-3 border border-rule/30 bg-void p-3 transition-all duration-300 hover:border-gold/20"
+                >
+                  <div className="flex h-8 w-8 items-center justify-center" style={{ backgroundColor: `${agent.color}10` }}>
+                    <AgentGlyph name={agent.name} size={18} stroke={agent.color} />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-ivory/90">{agent.name}</span>
+                      <div className="h-2 w-2 rounded-full" style={{ backgroundColor: agent.status === 'available' ? '#00B4A8' : '#D8B36A' }} />
                     </div>
-                  </Reveal>
-                ))}
-              </div>
+                    <p className="label text-ivory/30">{agent.role}</p>
+                  </div>
+                </Link>
+              ))}
             </div>
           </div>
         </div>
-      </section>
 
-      <SectionDivider variant="particles" flip />
-
-      {/* ECOSYSTEM */}
-      <section className="section-md bg-void-deep">
-        <div className="mx-auto max-w-[1440px] px-6 md:px-10 lg:px-16">
-          <Reveal>
-            <div className="mb-20 flex items-baseline gap-6">
-              <span className="label text-gold">The Stack</span>
-              <span className="h-px flex-1 bg-rule" />
-              <span className="label text-ivory/40">06 / 06</span>
+        {/* Bottom Row */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {/* Recent Proposals */}
+          <div className="border border-rule bg-void-deep p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="font-display text-xl text-ivory" style={{ fontFamily: 'var(--font-display), serif' }}>Active Proposals</h2>
+              <Link href="/governance" className="label text-gold/60 hover:text-gold">View All →</Link>
             </div>
-          </Reveal>
-          <Reveal delay={0.1}><h3 className="headline-section max-w-3xl text-ivory">Six systems. One civilization engine.</h3></Reveal>
-          <div className="mt-24 divide-y divide-rule border-t border-b border-rule">
-            {ECOSYSTEM.map((item, i) => (
-              <Reveal key={item.name} delay={0.05 * i}>
-                <article className="grid grid-cols-12 items-baseline gap-6 py-12 transition-colors duration-500 hover:bg-sapphire/20">
-                  <span className="label col-span-2 text-gold/60 md:col-span-1">{String(i + 1).padStart(2, '0')}</span>
-                  <h4 className="font-display col-span-10 text-2xl text-ivory md:col-span-4 md:text-3xl" style={{ fontFamily: 'var(--font-display), serif' }}>{item.name}</h4>
-                  <p className="col-span-12 text-base text-ivory/70 md:col-span-7" style={{ lineHeight: '1.65' }}>{item.desc}</p>
-                </article>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <SectionDivider variant="glyph" />
-
-      {/* FINAL CTA */}
-      <section id="enter" className="section-lg">
-        <div className="mx-auto max-w-[1440px] px-6 text-center md:px-10 lg:px-16">
-          <Reveal><span className="label text-gold">Final Word</span></Reveal>
-          <Reveal delay={0.15}><h2 className="headline-hero mt-12 text-ivory">{FINAL.title}</h2></Reveal>
-          <Reveal delay={0.3}>
-            <p className="mx-auto mt-12 max-w-2xl font-display text-xl italic text-ivory/85 md:text-2xl" style={{ fontFamily: 'var(--font-display), serif', lineHeight: '1.6' }}>
-              {FINAL.body}
-            </p>
-          </Reveal>
-          <Reveal delay={0.5}>
-            <div className="mt-16">
-              <a href="#chapter-1" className="label inline-flex items-center gap-3 border border-gold px-10 py-5 text-gold transition-all duration-700 hover:bg-gold hover:text-void">
-                Explore MYTH<span aria-hidden="true">→</span>
-              </a>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* FOOTER */}
-      <footer className="border-t border-rule bg-void-deep">
-        <div className="mx-auto max-w-[1440px] px-6 py-16 md:px-10 lg:px-16">
-          <div className="grid grid-cols-1 gap-12 md:grid-cols-12">
-            <div className="md:col-span-5">
-              <div className="flex items-center gap-3">
-                <MythMark size={40} stroke="#F7F4EE" />
-                <span className="font-display text-2xl text-ivory" style={{ fontFamily: 'var(--font-display), serif' }}>MYTH</span>
-              </div>
-              <p className="mt-6 max-w-md text-sm text-ivory/55" style={{ lineHeight: '1.7' }}>
-                The first Culture Engine. Infrastructure for civilizations that intend to be remembered.
-              </p>
-              <p className="mt-8 label text-ivory/30">© 2026 MYTH Foundation</p>
-            </div>
-            <div className="md:col-span-7">
-              <div className="grid grid-cols-2 gap-8 md:grid-cols-3">
-                <div>
-                  <span className="label text-gold/70">Engine</span>
-                  <ul className="mt-4 space-y-3">
-                    {['Genesis', 'Intelligence', 'Archive', 'Commons', 'Market', 'Atlas'].map((x) => (
-                      <li key={x}><a href="#" className="text-sm text-ivory/65 transition-colors duration-300 hover:text-gold">{x}</a></li>
-                    ))}
-                  </ul>
+            <div className="space-y-3">
+              {Object.values(CIVILIZATION_PROFILES).flatMap((civ) =>
+                civ.governance.proposals.filter(p => p.status === 'voting').map((proposal) => ({
+                  ...proposal,
+                  civName: civ.name,
+                  civColor: civ.color,
+                }))
+              ).slice(0, 5).map((proposal, i) => (
+                <div key={i} className="border border-rule/30 bg-void p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="h-2 w-2 rounded-full" style={{ backgroundColor: proposal.civColor }} />
+                      <span className="text-sm text-ivory/90">{proposal.title}</span>
+                    </div>
+                    <span className="label text-gold">{proposal.civName}</span>
+                  </div>
+                  <div className="mt-2 flex items-center justify-between">
+                    <span className="label text-ivory/30">{proposal.votesFor} For / {proposal.votesAgainst} Against</span>
+                    <span className="label text-teal">Voting</span>
+                  </div>
                 </div>
-                <div>
-                  <span className="label text-gold/70">Network</span>
-                  <ul className="mt-4 space-y-3">
-                    {['Solana', 'Documentation', 'Whitepaper', 'GitHub', 'Brand Kit'].map((x) => (
-                      <li key={x}><a href="#" className="text-sm text-ivory/65 transition-colors duration-300 hover:text-gold">{x}</a></li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <span className="label text-gold/70">Civilization</span>
-                  <ul className="mt-4 space-y-3">
-                    {['About', 'Foundation', 'Careers', 'Press', 'Contact'].map((x) => (
-                      <li key={x}><a href="#" className="text-sm text-ivory/65 transition-colors duration-300 hover:text-gold">{x}</a></li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
+              ))}
+              {Object.values(CIVILIZATION_PROFILES).flatMap((civ) => civ.governance.proposals.filter(p => p.status === 'voting')).length === 0 && (
+                <p className="text-center label text-ivory/30 py-4">No active proposals</p>
+              )}
             </div>
           </div>
-          <div className="mt-16 flex flex-col items-start justify-between gap-4 border-t border-rule pt-8 md:flex-row md:items-center">
-            <span className="label text-ivory/30">Version 1.0 / Genesis Draft</span>
-            <span className="label text-ivory/30">A civilization operating system</span>
+
+          {/* Quick Actions */}
+          <div className="border border-rule bg-void-deep p-6">
+            <h2 className="font-display text-xl text-ivory mb-6" style={{ fontFamily: 'var(--font-display), serif' }}>Quick Actions</h2>
+            <div className="grid grid-cols-2 gap-3">
+              <Link href="/forge" className="flex flex-col items-center gap-2 border border-rule bg-void p-6 transition-all duration-500 hover:border-gold/30">
+                <span className="text-2xl">⚒</span>
+                <span className="text-sm text-ivory/90">Forge Canon</span>
+                <span className="label text-ivory/30">Create lore</span>
+              </Link>
+              <Link href="/marketplace" className="flex flex-col items-center gap-2 border border-rule bg-void p-6 transition-all duration-500 hover:border-gold/30">
+                <span className="text-2xl">◉</span>
+                <span className="text-sm text-ivory/90">Hire Agent</span>
+                <span className="label text-ivory/30">Assign work</span>
+              </Link>
+              <Link href="/governance" className="flex flex-col items-center gap-2 border border-rule bg-void p-6 transition-all duration-500 hover:border-gold/30">
+                <span className="text-2xl">⚖</span>
+                <span className="text-sm text-ivory/90">Vote</span>
+                <span className="label text-ivory/30">Active proposals</span>
+              </Link>
+              <Link href="/analytics" className="flex flex-col items-center gap-2 border border-rule bg-void p-6 transition-all duration-500 hover:border-gold/30">
+                <span className="text-2xl">◔</span>
+                <span className="text-sm text-ivory/90">Analytics</span>
+                <span className="label text-ivory/30">Market data</span>
+              </Link>
+              <Link href="/civilizations" className="flex flex-col items-center gap-2 border border-rule bg-void p-6 transition-all duration-500 hover:border-gold/30">
+                <span className="text-2xl">⬡</span>
+                <span className="text-sm text-ivory/90">Civilizations</span>
+                <span className="label text-ivory/30">Manage worlds</span>
+              </Link>
+              <Link href="/whitepaper" className="flex flex-col items-center gap-2 border border-rule bg-void p-6 transition-all duration-500 hover:border-gold/30">
+                <span className="text-2xl">◈</span>
+                <span className="text-sm text-ivory/90">Whitepaper</span>
+                <span className="label text-ivory/30">Download PDF</span>
+              </Link>
+            </div>
           </div>
         </div>
-      </footer>
-    </main>
+
+        {/* Footer */}
+        <div className="border-t border-rule pt-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <MythMark size={32} stroke="#F7F4EE" />
+            <div>
+              <span className="font-display text-lg text-ivory" style={{ fontFamily: 'var(--font-display), serif' }}>MYTH</span>
+              <p className="label text-ivory/30">The Culture Engine</p>
+            </div>
+          </div>
+          <span className="label text-ivory/20">© 2026 MYTH Foundation</span>
+        </div>
+      </div>
+    </DashboardLayout>
   );
 }

@@ -9,8 +9,8 @@ import { WagmiWalletProvider } from '@/components/WalletProvider';
 import { ChatBot } from '@/components/ChatBot';
 
 export const metadata: Metadata = {
-  title: 'MYTH — The Culture Engine',
-  description: 'Build worlds that outlive you. The first Culture Engine for persistent digital civilizations.',
+  title: 'MYTH — Dashboard',
+  description: 'The Culture Engine. Build worlds that outlive you.',
   icons: {
     icon: [
       { url: '/favicon.svg', type: 'image/svg+xml' },
