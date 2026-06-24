@@ -326,3 +326,38 @@ html.lenis body {
     transform: scale(1.2);
   }
 }
+
+/* ─── WalletConnect / wagmi modal overrides ─────────────── */
+[data-rk] {
+  --wcm-z-index: 99999 !important;
+}
+
+[id^="wcm-"] {
+  z-index: 99999 !important;
+}
+
+.wcm-overlay,
+.wcm-modal {
+  z-index: 99999 !important;
+}
+
+.wcm-backdrop {
+  z-index: 99998 !important;
+  background: rgba(5, 7, 11, 0.85) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+@media (max-width: 768px) {
+  .wcm-modal {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    border-radius: 0 !important;
+  }
+}
+
+/* ─── Landing page animation ─────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
